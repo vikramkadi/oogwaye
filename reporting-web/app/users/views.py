@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask import request
 
-users_mod = Blueprint('report', __name__)
+users_mod = Blueprint('users', __name__)
 
 @users_mod.route('/profiles/<id>')
 def show_template(id):
