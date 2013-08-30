@@ -1,0 +1,35 @@
+Global settings:
+        Archival-settings
+		-max number of copies
+
+Storage for Users:
+	Users are in json
+	Roles are in json
+	Datasources are in json
+
+SQL Lite tables:
+
+    	ReportStructure
+		-report-uuid
+		-report-name
+		-report-query
+		-report-ds-id
+		-report-
+		-created-by/dt
+		-modified-by/dt
+		
+	Report Instances
+	        -instance-uuid
+		-report-uuid
+		-
+		-instance-generated-time
+
+	Dashboard:
+		-dashboard-id
+		-user-id
+		-dashboard-
+	Dashboard-tiles
+		-dashboard-id
+		-order
+		-report-uuid
+		-
