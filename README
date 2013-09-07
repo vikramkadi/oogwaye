@@ -1,0 +1,19 @@
+Commit documents to local repository:
+git status
+git add docs/*
+git commit -m "comment"
+
+Commit documents to assembla:
+Git remote -v
+Git remote add origin git@...  (one-time initialization)
+Git push origin master
+
+Add new open source library as submodule:
+(http://git-scm.com/book/en/Git-Tools-Submodules)
+e.g.  git submodule add https://github.com/harborhoffer/Super-Theme-Switcher.git reporting-web/app/static/js/libs/Super-Theme-Switcher
+
+Check out project with submodules:
+git clone git@git.assembla.com:oogwaye.git
+git submodule init  (one-time)
+git submodule update
+
