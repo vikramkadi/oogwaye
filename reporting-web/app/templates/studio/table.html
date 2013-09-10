@@ -1,137 +1,54 @@
-<DIV class="ui-layout-north ui-widget">
+<div id="table-sidebar" class="row">
+        <div class="col-md-2 col-xs-3">
+	  <div class="panel panel-default" style="height: auto">
+	    <div class="panel-heading">
+		<span class="panel-title">Categories</span>
+	    </div>
+	    <!-- list group -->
+	    <ul class="list-group">
+              <li class="list-group-item"><span class="badge"><i class="icon-calendar icon-white"></i></span>Date</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Vendor</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Product</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Customer</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Description</li>
+	    </ul>
+          </div>
 
-	<DIV class="toolbar ui-widget-content ui-state-active">Toolbar - tab3</DIV>
-			
-</DIV><!-- #north -->
+	  <div class="panel panel-default" style="height: auto">
+	    <div class="panel-heading">
+		<span class="panel-title">Measurements</span>
+	    </div>
+	    <!-- list group -->
+	    <ul class="list-group">
+              <li class="list-group-item"><span class="badge"><i class="icon-signal icon-white"></i></span>Transactions</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Avg Sales</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Min Sales</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Max Sales</li>
+	    </ul>
+          </div>
+        </div><!-- /.col-md-2 -->
 
-<DIV class="ui-layout-south ui-widget">
-
-	<DIV class="toolbar ui-widget-content ui-state-default">Statusbar - tab3</DIV>
-			
-</DIV><!-- #south -->
-
-<DIV id="innerTabs" class="ui-layout-center container tabs">
-
-	<DIV class="ui-widget-header ui-corner-top"> Center-Center </DIV>		
-	<UL>
-		<LI class="tab1"><A href="#simpleTab1">Tab #1</A></LI>
-		<LI class="tab2"><A href="#simpleTab2">Tab #2</A></LI>
-		<LI class="tab3"><A href="#simpleTab3">Tab #3</A></LI>
-	</UL>
-		
-	<DIV class="ui-widget-content" style="border-top: 0;">
-
-		<DIV id="simpleTab1" class="container" style="height: 100%;">
-			<DIV class="accordion">
-				
-				<H3><A href="#">Section 1</A></H3>
-				<DIV>
-					<P>Mauris mauris ante, blandit et, ultrices a, suscipit eget, quam. 
-						Integer ut neque. Vivamus nisi metus, molestie vel, gravida in, condimentum sit amet, nunc.
-					</P>
-					<P>Nam a nibh. Donec suscipit eros. Nam mi. Proin viverra leo ut odio. Curabitur malesuada. 
-						Vestibulum a velit eu ante scelerisque vulputate.
-					</P>
-				</DIV>
-					
-				<H3><A href="#">Section 2</A></H3>
-				<DIV>
-					<P style="font-weight: bold;">Sed Non Urna</P>
-					<P>Donec et ante. Phasellus eu ligula. Vestibulum sit amet purus.
-						Vivamus hendrerit, dolor at aliquet laoreet, mauris turpis porttitor velit,
-						faucibus interdum tellus libero ac justo.
-					</P>
-					<P>Vivamus non quam. In suscipit faucibus urna.</P>
-				</DIV>
-					
-				<H3><A href="#">Section 3</A></H3>
-				<DIV>
-					<P>Nam enim risus, molestie et, porta ac, aliquam ac, risus. Quisque lobortis.
-						Phasellus pellentesque purus in massa. Aenean in pede.
-					</P>
-					<P>Phasellus ac libero ac tellus pellentesque semper. Sed ac felis. Sed commodo, 
-						magna quis lacinia ornare, quam ante aliquam nisi, eu iaculis leo purus venenatis dui.
-					</P>
-					<UL>
-						<LI>List item one</LI>
-						<LI>List item two</LI>
-						<LI>List item three</LI>
-						<LI>Another Item</LI>
-						<LI>Another Item</LI>
-						<LI>Another Item</LI>
-						<LI>Another Item</LI>
-						<LI>Another Item</LI>
-						<LI>Another Item</LI>
-						<LI>Another Item</LI>
-					</UL>
-				</DIV>
-					
-				<H3><A href="#">Section 4</A></H3>
-				<DIV>
-					<P>Cras dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames 
-						ac turpis egestas.
-					</P>
-					<P>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
-						Aenean lacinia mauris vel est.
-					</P>
-					<P>Suspendisse eu nisl. Nullam ut libero. Integer dignissim consequat lectus.
-						Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
-					</P>
-				</DIV>
-
-			</DIV><!-- #accordion -->
-		</DIV><!-- #simpleTab1 -->
-
-		<DIV id="simpleTab2">
-			Tab #2 Content
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-		</DIV><!-- #simpleTab2 -->
-
-		<DIV id="simpleTab3"> Tab #3 Content </DIV>
-
-	</DIV><!-- #widget-content -->
-
-	<DIV class="ui-widget-footer ui-widget-header ui-corner-bottom">Center-Center Footer</DIV>
-
-</DIV><!-- #center -->
-
-{% include "/studio/table-sidebar-west.html" without context %}
-
-<DIV class="ui-layout-east">
-
-	<DIV class="ui-layout-center">
-		<DIV class="ui-widget-header ui-corner-top">East-Center</DIV>
-		<DIV class="ui-widget-content">
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-			<P>List of Items</P>
-		</DIV>
-		<DIV class="ui-widget-footer ui-widget-header ui-corner-bottom">East-Center Footer</DIV>
-	</DIV><!-- #east-center -->
-
-	<DIV class="ui-layout-south">
-		<DIV class="ui-widget-header ui-corner-top">East-South</DIV>
-		<DIV class="ui-widget-content">
-			<DIV><A href="#">Another Item</A></DIV>
-			<DIV><A href="#">Another Item</A></DIV>
-			<DIV><A href="#">Another Item</A></DIV>
-			<DIV><A href="#">Another Item</A></DIV>
-			<DIV><A href="#">Another Item</A></DIV>
-			<DIV><A href="#">Another Item</A></DIV>
-		</DIV>
-		<DIV class="ui-widget-footer ui-widget-header ui-corner-bottom">East-South Footer</DIV>
-	</DIV><!-- #east-south -->
-
-</DIV><!-- #south -->
+        <div class="col-md-10 col-xs15">
+	  <div class="container">
+	  <div class="row">
+	  <div class="col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon">Table Rows</span>
+	      <input type="text" class="form-control" placeholder="drag and drop table headers here">
+	    </div>
+	  </div>
+	  <div class="col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon">Table Columns</span>
+	      <input type="text" class="form-control" placeholder="drag and drop table headers here">
+	    </div>
+	  </div>
+	  </div>
+          <div class="jumbotron" style="height: 100%">
+	      <h1>Whiteboard</h1>
+              <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+              <p><a class="btn btn-primary btn-lg">Learn more</a></p>
+            </div>
+          </div>
+        </div><!-- /.col-md-10 -->
+</div>

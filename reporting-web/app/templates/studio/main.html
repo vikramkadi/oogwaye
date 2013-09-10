@@ -1,196 +1,131 @@
-<!DOCTYPE html> 
-<HTML> 
-<HEAD>
-	<META http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-	<TITLE>Daton Reporting Studio</TITLE>
+    <title>Daton Reporting Studio (based on Bootstrap template)</title>
 
-	<LINK rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/studio/main.css')}}">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
 
-	<SCRIPT type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></SCRIPT>
-	<SCRIPT type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></SCRIPT>
-	<SCRIPT type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></SCRIPT>
-	<SCRIPT type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout.resizeTabLayout-latest.js')}}"></SCRIPT>
-	<SCRIPT type="text/javascript" src="{{url_for('static',filename='js/libs/Super-Theme-Switcher/jquery.themeswitcher.js')}}"></SCRIPT>
-	<SCRIPT type="text/javascript" src="{{url_for('static',filename='js/studio/table.js')}}"></SCRIPT>
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
 
-	<SCRIPT type="text/javascript">
-	/*
-	 *	Utility methods used for UI Theme Selector
-	 */
-	function resizePageLayout () {
-		var pageLayout = $("body").data("layout");
-		if (pageLayout) pageLayout.resizeAll();
-	};
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/studio/main.css')}}">
 
-	/*
-	 *	Define options for all the layouts
-	 */
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
 
-	var pageLayoutOptions = {
-		name:					'pageLayout' 	// only for debugging
-	,	resizeWithWindowDelay:			250		// delay calling resizeAll when window is *still* resizing
-	//,	resizeWithWindowMaxDelay: 		2000		// force resize every XX ms while window is being resized
-	,	resizable:				false
-	,	slidable:				false
-	,	closable:				false
-	,	north__paneSelector:			"#outer-north"
-	,	center__paneSelector:			"#outer-center" 
-	,	south__paneSelector:			"#outer-south" 
-	,	south__spacing_open:			0
-	,	north__spacing_open:			0
-	
-	//	add a child-layout inside the center-pane
-	,	center__children: {
-			name:				'tabsContainerLayout'
-		,	resizable:			false
-		,	slidable:			false
-		,	closable:			false
-		,	north__paneSelector:		"#tabbuttons"
-		,	center__paneSelector:		"#outerTabs" 
-		,	spacing_open:			0
-		,	center__onresize:		$.layout.callbacks.resizeTabLayout // resize ALL visible layouts nested inside
-		}
-	};
+    <!-- Import JS Libraries -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready( function() {
+        // Adjust height of workspace panels to cover full screen
+        $("[id*='sidebar'] > [class*='col-md-']").each(function() {
+	  var golden_ratio = 1.62;
+	  $(this).height($(this).parent().width()/golden_ratio);
+        });
+      });
+    </script>
+
+  </head>
+
+  <body >
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" style="color:#000" href="#">DATON</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle active" data-toggle="dropdown"><i class="icon-home icon-white"></i> Home</a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Preferences</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">File</b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">New</a></li>
+                <li><a href="#">Open</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Import</a></li>
+                <li><a href="#">Export</a></li>
+                <li><a href="#">Save</a></li>
+                <li><a href="#">Revert</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">View</b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Table</a></li>
+                <li><a href="#">Graph</a></li>
+                <li><a href="#">Dashboard</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit</b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Undo</a></li>
+                <li><a href="#">Redo</a></li>     
+		<li class="divider"></li>
+                <li><a href="#">Cut</a></li>
+                <li><a href="#">Copy</a></li>
+		<li><a href="#">Paste</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help</b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">User Guide</a></li>
+                <li><a href="#">Tutorials</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </li>
+
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div><!--/ .container -->
+      </div><!--/ .nav-inner -->
+    </div><!--/ .navbar -->
+
+    <div class="container theme-showcase">
+      {% include "/studio/table.html" %}
+    </div>
+
+    </div> <!-- /container -->
 
 
-	//	define sidebar options here because are used for BOTH east & west tab-panes (see below)
-	var sidebarLayoutOptions = {
-		name:					'sidebarLayout' // only for debugging
-	,	showErrorMessages:			false		// some panes do not have an inner layout
-	,	resizeWhileDragging:			true
-	,   	north__size:				"30%"
-	,   	south__size:				"30%"
-	,	minSize:				100
-	,	center__minHeight:			100
-	,	spacing_open:				10
-	,	spacing_closed:				10
-	,	contentSelector:			".ui-widget-content"
-	,	togglerContent_open:			'<div class="ui-icon"></div>'
-	,	togglerContent_closed:			'<div class="ui-icon"></div>'
-	};
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/holder/2.0/holder.js"></script>
 
-	//	options used for the tab-panel-layout on all 3 tabs
-	var tabLayoutOptions = {
-		name:					'tabPanelLayout' // only for debugging
-	,	resizeWithWindow:			false		// required because layout is 'nested' inside outerTabs container
-	//,	resizeWhileDragging:			true		// slow in IE because of the nested layouts
-	,	resizerDragOpacity:			0.5
-	,	north__resizable:			false
-	,	south__resizable:			false
-	,	north__closable:			false
-	,	south__closable:			false
-	,	west__minSize:				200
-	,	east__minSize:				200
-	,	center__minWidth:			400
-	,	spacing_open:				10
-	,	spacing_closed:				10
-	,	contentSelector:			".ui-widget-content"
-	,	togglerContent_open:			'<div class="ui-icon"></div>'
-	,	togglerContent_closed:			'<div class="ui-icon"></div>'
-	,	triggerEventsOnLoad:			true // so center__onresize is triggered when layout inits
-	,	center__onresize:			$.layout.callbacks.resizePaneAccordions // resize ALL Accordions nested inside
-	,	west__onresize:				$.layout.callbacks.resizePaneAccordions // ditto for west-pane
-	/*
-	,	center__onresize: function (pane, $Pane) {
-			$Pane.find(":ui-accordion").accordion("resize");
-		}
-	*/
-
-	//	add child-layouts for BOTH the east/west panes (sidebars)
-	//	sidebarLayoutOptions was created above so they could be used twice here
-	,	west__children:				sidebarLayoutOptions
-	,	east__children:				sidebarLayoutOptions
-	};
-
-	$(document).ready( function() {
-
-		// create the page-layout, which will ALSO create the tabs-wrapper child-layout
-		var pageLayout = $("body").layout( pageLayoutOptions ); 
-
-		// init the tabs inside the center-pane
-		// NOTE: layout.center = NEW pane-instance object
-		//pageLayout.center.pane
-		$("#outer-center").tabs({
-				// using callback addon
-				activate: $.layout.callbacks.resizeTabLayout
-
-				/* OR using a manual/custom callback
-				activate: function (evt, ui) {
-					var tabLayout = $(ui.newPanel).data("layout");
-					if ( tabLayout ) tabLayout.resizeAll();
-				}*/
-			})
-			// make the tabs sortable
-			.find(".ui-tabs-nav") .sortable({ axis: 'x', zIndex: 2 }) .end()
-		;
-
-		// after creating the tabs, resize the tabs-wrapper layout...
-		// we can access this layout as a 'child' property of the outer-center pane
-		pageLayout.center.children.tabsContainerLayout.resizeAll();
-
-		// init ALL the tab-layouts - all use the same options
-		// layout-initialization will _complete_ the first time each layout becomes 'visible'
-		$("#outerTabs > .tab-panel").each(function() {
-			$(this).layout( tabLayoutOptions );
-		});
-
-		initTablePane($("#table-pane"));
-
-		// init inner-tabs inside outer-tab #3
-		$("#innerTabs").tabs({
-			// look for and resize inner-accordion(s) each time a tab-panel is shown
-			activate: $.layout.callbacks.resizePaneAccordions
-		});
-
-		// init ALL accordions (all have .accordion class assigned)
-		// accordions' 'height' will be reset as each becomes 'visible'
-		$(".accordion").accordion({ heightStyle: "fill" });
-		
-    		$("#switcher").themeswitcher({
-    				imgpath:   "{{url_for('static',filename='js/libs/Super-Theme-Switcher/images/')}}",
-    				loadTheme: "dot-luv"
-    		});
-	});
-	</SCRIPT> 
- 
-</HEAD>
-
-<BODY> 
-
-<DIV id="outer-north" class="hidden" style="padding:1em 1em">Outer-North Pane</DIV>
-
-<DIV id="outer-south" class="hidden" style="padding:.5em 1em">
-	<DIV class="buttons">
-		<button onclick="resizePageLayout()">Resize Layout</button>
-	</DIV>
-</DIV>
-
-<DIV id="outer-center" class="container tabs hidden">
-
-	<UL id="tabbuttons" class="hidden">
-		<LI><A href="#table-pane">Table</A></LI>
-		<LI><A href="#viz-pane">Visualize</A></LI>
-		<LI><A href="#dashboard-pane">Dashboard</A></LI>
-	</UL>
-
-	<DIV id="themeContainer" style="position: absolute; top: 13px; right: 20px; z-index: 1;">
-    		<div id="switcher"></div>
-	</DIV>
-
-	<DIV id="outerTabs">
-		<DIV id="table-pane" class="tab-panel hidden">
-			{% include "/studio/table.html" %}
-		</DIV>
-		<DIV id="viz-pane" class="tab-panel hidden">
-			{% include "/studio/accordion.html" %}
-		</DIV>
-		<DIV id="dashboard-pane" class="tab-panel hidden">
-			{% include "/studio/dashboard.html" %}
-		</DIV>
-	</DIV><!-- #outerTabs -->
-
-</DIV><!-- #outer-center -->
-
-</BODY>
-</HTML>
+  </body>
+</html>

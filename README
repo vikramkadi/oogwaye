@@ -1,3 +1,13 @@
+Locally Executing Web Page:
+---------------------------
+% ~/Work/python-env/daton/bin/activate
+% cd ~/Work/oogwaye/reporting-web
+% python run.py
+% webbrowser open http://localhost:5000/studio/ttruong
+
+
+Git Version Control:
+--------------------
 Commit documents to local repository:
 git status
 git add docs/*
