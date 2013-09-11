@@ -1,0 +1,72 @@
+{% extends "/common/main.html" %}
+
+{% block script %}
+    {{ super() }}
+{% endblock script %}
+
+{% block header %}
+    {% include "/report/header.html" %}
+{% endblock header %}
+
+{% block content %}
+    <div class="container theme-showcase">
+      <div id="table-workspace" class="row">
+        <div class="col-md-2 col-xs-3">
+	  <div class="panel panel-default" style="height: auto">
+	    <div class="panel-heading">
+		<span class="panel-title">Categories</span>
+	    </div>
+	    <!-- list group -->
+	    <ul class="list-group">
+              <li class="list-group-item"><span class="badge"><i class="icon-calendar icon-white"></i></span>Date</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Vendor</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Product</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Customer</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Description</li>
+	    </ul>
+          </div>
+
+	  <div class="panel panel-default" style="height: auto">
+	    <div class="panel-heading">
+		<span class="panel-title">Measurements</span>
+	    </div>
+	    <!-- list group -->
+	    <ul class="list-group">
+              <li class="list-group-item"><span class="badge"><i class="icon-signal icon-white"></i></span>Transactions</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Avg Sales</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Min Sales</li>
+              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Max Sales</li>
+	    </ul>
+          </div>
+        </div><!-- /.col-md-2 -->
+
+        <div class="col-md-10 col-xs15">
+	  <div class="container">
+	    <div class="row">
+	    <div class="col-md-6">
+	      <div class="input-group">
+  	        <span class="input-group-addon">Table Rows</span>
+	        <input type="text" class="form-control" placeholder="drag and drop table headers here">
+	      </div>
+	    </div>
+	    <div class="col-md-6">
+	      <div class="input-group">
+  	        <span class="input-group-addon">Table Columns</span>
+	        <input type="text" class="form-control" placeholder="drag and drop table headers here">
+	      </div>
+	    </div>
+	  </div>
+          <div class="jumbotron" style="height: 100%">
+	      <h1>Whiteboard</h1>
+              <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+              <p><a class="btn btn-primary btn-lg">Learn more</a></p>
+            </div>
+          </div>
+	  <ul class="pager">
+	    <li><a href="#">Previous</a></li>
+  	    <li><a href="#">Next</a></li>
+	  </ul>
+        </div><!-- /.col-md-10 -->
+      </div><!-- /#table-workspace -->
+    </div> <!-- /.container -->
+{% endblock %}

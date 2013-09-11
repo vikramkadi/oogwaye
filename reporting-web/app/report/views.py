@@ -10,4 +10,4 @@ def create_report_step_1():
 
 @report_mod.route('/create/step2')
 def create_report_step_2():
-    return render_template('/report/create_step_2.html')
+    return render_template('/report/table.html')
