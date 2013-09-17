@@ -2,6 +2,8 @@
 
 {% block style %}
     {{ super() }}
+    <!-- <link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input.css')}}" type="text/css" /> -->
+    <link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input-facebook.css')}}" type="text/css" />
 <style>
 .highlight {
     border: 1px solid red;
@@ -17,6 +19,8 @@
 
 {% block script %}
     {{ super() }}
+    <!-- <script type="text/javascript" src="{{url_for('static', filename='js/libs/jquery-tokeninput/src/jquery.tokeninput.js')}}"></script> -->
+
     <script>
     $(document).ready( function() {
 
@@ -36,10 +40,18 @@
         activeClass: "ui-state-default",
         hoverClass: "ui-state-hover",
         drop: function( event, ui ) {
-          $(this).val( ui.draggable.text() );
+	  var token = $( "<li></li>" ).addClass( "token-input-token-facebook" );
+	  $( "<p></p>" ).html( ui.draggable.text() ).appendTo( token );
+	  $( "<span></span>" ).addClass( "icon-remove-sign" ).appendTo( token );
+	  $("#placeholder", this).before( token[0] );
         }
       });
 
+      $( "li .icon-remove-sign" ).click(function() {
+	var token = this.parent();
+	console.log(token);
+	token.remove();
+      });
     });
     </script>
 {% endblock script %}
@@ -79,40 +91,33 @@
 	    </ul>
           </div>
         </div><!-- /.col-md-2 -->
-
+	
         <div class="col-md-10 col-xs15">
-	  <div class="container">
-	    <div class="row">
-	    <div class="col-md-6">
-	      <div class="input-group">
-  	        <span class="input-group-addon">Table Rows</span>
-	        <input type="text" class="form-control droppable-input" placeholder="drag and drop table headers here">
-	      </div>
-	    </div>
-	    <div class="col-md-6">
-	      <div class="input-group">
-  	        <span class="input-group-addon">Table Columns</span>
-	        <input type="text" class="form-control droppable-input" placeholder="drag and drop table headers here">
-	      </div>
-	    </div>
-	  </div>
 
 	  <div class="container">
 	    <form class="form-horizontal">
-  	    <div class="form-group">
-    	      <label class="col-md-2 control-label">Table Rows</label>
-    		<div class="col-md-10">
-      		  <input type="text" class="form-control droppable-input" id="table-rows" placeholder="drag and drop table headers here">
-    		</div>
-  	    </div>
-  	    <div class="form-group">
-    	      <label class="col-md-2 control-label">Table Columns</label>
-    	      <div class="col-md-10">
-      		<input type="text" class="form-control droppable-input" id="table-columns" placeholder="drag and drop table headers here">
-    	      </div>
-  	    </div>
-	    </form>
-	  </div>
+  	      <div class="form-group">
+    	        <label class="col-md-2 control-label">Table Rows</label>
+    	        <div class="col-md-10">
+		  <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+		    <li id="placeholder">
+			<input type="text" autocomplete="off"  style="outline: none">
+		    </li>
+		  </ul>
+    	        </div>
+  	      </div>
+  	      <div class="form-group">
+    	        <label class="col-md-2 control-label">Table Columns</label>
+    	        <div class="col-md-10">
+		  <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+		    <li id="placeholder">
+			<input type="text" autocomplete="off"  style="outline: none">
+		    </li>
+		  </ul>
+    	        </div>
+  	      </div>
+	    </form><!-- /.form-horizontal -->
+	  </div><!-- /.container -->
 
           <div class="jumbotron" style="height: 100%">
 	      <h1>Whiteboard</h1>
