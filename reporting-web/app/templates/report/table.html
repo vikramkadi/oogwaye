@@ -2,19 +2,21 @@
 
 {% block style %}
     {{ super() }}
-    <!-- <link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input.css')}}" type="text/css" /> -->
     <link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input-facebook.css')}}" type="text/css" />
-<style>
-.highlight {
-    border: 1px solid red;
-    font-weight: bold;
-    font-size: 45px;
-    background-color: lightblue;
-}
-.form-horizontal .control-label{
-  text-align:right;
-}
-</style>
+    <style>
+    .highlight {
+      border: 1px solid red;
+      font-weight: bold;
+      font-size: 45px;
+      background-color: lightblue;
+    }
+    .form-horizontal .control-label {
+      text-align:right;
+    }
+    .form-horizontal .form-group {
+      margin-bottom: 0px;
+    }
+    </style>
 {% endblock style %}
 
 {% block script %}
@@ -42,16 +44,13 @@
         drop: function( event, ui ) {
 	  var token = $( "<li></li>" ).addClass( "token-input-token-facebook" );
 	  $( "<p></p>" ).html( ui.draggable.text() ).appendTo( token );
-	  $( "<span></span>" ).addClass( "icon-remove-sign" ).appendTo( token );
+	  $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
+		this.parentNode.remove();
+	  }).appendTo( token );
 	  $("#placeholder", this).before( token[0] );
         }
       });
 
-      $( "li .icon-remove-sign" ).click(function() {
-	var token = this.parent();
-	console.log(token);
-	token.remove();
-      });
     });
     </script>
 {% endblock script %}
@@ -63,7 +62,8 @@
 {% block content %}
     <div class="container theme-showcase">
       <div id="table-workspace" class="row">
-        <div class="col-md-2 col-xs-3 draggable-list">
+        <div class="col-md-2 col-xs-3 bordered">
+
 	  <div class="panel panel-default" style="height: auto">
 	    <div class="panel-heading">
 		<span class="panel-title">Categories</span>
@@ -90,18 +90,19 @@
               <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Max Sales</li>
 	    </ul>
           </div>
+
         </div><!-- /.col-md-2 -->
 	
-        <div class="col-md-10 col-xs15">
+        <div class="col-md-10 col-xs15 bordered">
 
 	  <div class="container">
-	    <form class="form-horizontal">
+	    <form class="form-horizontal" role="form">
   	      <div class="form-group">
     	        <label class="col-md-2 control-label">Table Rows</label>
     	        <div class="col-md-10">
 		  <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
 		    <li id="placeholder">
-			<input type="text" autocomplete="off"  style="outline: none">
+			<input type="text" autocomplete="off" style="outline: none" placeholder="Headers">
 		    </li>
 		  </ul>
     	        </div>
@@ -111,7 +112,7 @@
     	        <div class="col-md-10">
 		  <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
 		    <li id="placeholder">
-			<input type="text" autocomplete="off"  style="outline: none">
+			<input type="text" autocomplete="off" style="outline: none" placeholder="Headers">
 		    </li>
 		  </ul>
     	        </div>
@@ -119,16 +120,13 @@
 	    </form><!-- /.form-horizontal -->
 	  </div><!-- /.container -->
 
-          <div class="jumbotron" style="height: 100%">
+          <div class="jumbotron" style="height: auto">
 	      <h1>Whiteboard</h1>
               <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
               <p><a class="btn btn-primary btn-lg">Learn more</a></p>
             </div>
           </div>
-	  <ul class="pager">
-	    <li><a href="#">Previous</a></li>
-  	    <li><a href="#">Next</a></li>
-	  </ul>
+
         </div><!-- /.col-md-10 -->
       </div><!-- /#table-workspace -->
     </div> <!-- /.container -->
