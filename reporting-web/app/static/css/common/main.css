@@ -15,13 +15,16 @@ body {
   margin: 5px 0;
 }
 
+.bordered {
+  border: 1px solid #ddd;
+}
+
 [class^="col-"] {
   padding-top: 5px;
   padding-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
   background-color: #eee;
-  border: 1px solid #ddd;
   /*
   background-color: rgba(86,61,124,.15);
   border: 1px solid rgba(86,61,124,.2);
