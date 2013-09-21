@@ -34,10 +34,16 @@
     <script type="text/javascript">
       $(document).ready( function() {
         // Adjust height of workspace panels to cover full screen
-        $("[id*='workspace'] > [class*='col-md-']").each(function() {
+	/*
+        $("#studio [class*='col-md-']").each(function() {
 	  var golden_ratio = 1.62;
-	  $(this).height($(this).parent().width()/golden_ratio);
+	  $(this).height($("#studio").width()/golden_ratio);
         });
+	*/
+	$("#studio").each(function() {
+	  var golden_ratio = 1.62;
+	  $(this).height($(this).width()/golden_ratio);
+	});  
       });
     </script>
     {% endblock script %}

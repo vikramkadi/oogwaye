@@ -21,7 +21,6 @@
 
 {% block script %}
     {{ super() }}
-    <!-- <script type="text/javascript" src="{{url_for('static', filename='js/libs/jquery-tokeninput/src/jquery.tokeninput.js')}}"></script> -->
 
     <script>
     $(document).ready( function() {
@@ -60,74 +59,82 @@
 {% endblock header %}
 
 {% block content %}
-    <div class="container theme-showcase">
-      <div id="table-workspace" class="row">
-        <div class="col-md-2 col-xs-3 bordered">
-
-	  <div class="panel panel-default" style="height: auto">
-	    <div class="panel-heading">
+    <div id="studio" class="bordered container theme-showcase">
+      <div class="row">
+        <div id="sidebar" class="col-md-2 col-xs-3" style="height: auto">
+	  <div id="headers-group" class="container">
+	    <div class="panel panel-default" style="height: auto">
+	      <div class="panel-heading">
 		<span class="panel-title">Categories</span>
-	    </div>
-	    <!-- list group -->
-	    <ul id="categories-group" class="sortable list-group">
-              <li id= "foo" class="list-group-item"><span class="badge"><i class="icon-calendar icon-white"></i></span>Date</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Vendor</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Product</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Customer</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Description</li>
-	    </ul>
-          </div>
+	      </div>
+	      <!-- list group -->
+	      <ul id="categories-group" class="sortable list-group">
+                <li id= "foo" class="list-group-item"><span class="badge"><i class="icon-calendar icon-white"></i></span>Date</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Vendor</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Product</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Customer</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Description</li>
+	      </ul>
+            </div><!-- /.panel -->
 
-	  <div class="panel panel-default" style="height: auto">
-	    <div class="panel-heading">
+	    <div class="panel panel-default" style="height: auto">
+	      <div class="panel-heading">
 		<span class="panel-title">Measurements</span>
-	    </div>
-	    <!-- list group -->
-	    <ul id="measurements-group" class="sortable list-group">
-              <li class="list-group-item"><span class="badge"><i class="icon-signal icon-white"></i></span>Transactions</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Avg Sales</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Min Sales</li>
-              <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Max Sales</li>
-	    </ul>
-          </div>
-
-        </div><!-- /.col-md-2 -->
+	      </div>
+	      <!-- list group -->
+	      <ul id="measurements-group" class="sortable list-group">
+                <li class="list-group-item"><span class="badge"><i class="icon-signal icon-white"></i></span>Transactions</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Avg Sales</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Min Sales</li>
+                <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Max Sales</li>
+	      </ul>
+            </div><!-- /.panel -->
+	  </div><!-- /#headers-group -->
+        </div><!-- /#sidebar -->
 	
-        <div class="col-md-10 col-xs15 bordered">
+        <div id="workspace" class="col-md-10 col-xs15 tabbable" style="height: auto">
 
-	  <div class="container">
-	    <form class="form-horizontal" role="form">
-  	      <div class="form-group">
-    	        <label class="col-md-2 control-label">Table Rows</label>
-    	        <div class="col-md-10">
-		  <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
-		    <li id="placeholder">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#report1" data-toggle="tab">Report 1</a></li>
+	    <li><a href="#report2" data-toggle="tab">Report 2</a></li>
+	  </ul>
+
+	  <div class="tab-content"  style="height: auto">
+	    <div id="report1" class="tab-pane container active">
+	      <form class="form-horizontal" role="form">
+  	        <div class="form-group">
+    	          <label class="col-md-2 control-label">Table Rows</label>
+    	          <div class="col-md-10">
+		    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+		      <li id="placeholder">
 			<input type="text" autocomplete="off" style="outline: none" placeholder="Headers">
-		    </li>
-		  </ul>
-    	        </div>
-  	      </div>
-  	      <div class="form-group">
-    	        <label class="col-md-2 control-label">Table Columns</label>
-    	        <div class="col-md-10">
-		  <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
-		    <li id="placeholder">
+		      </li>
+		    </ul>
+    	          </div>
+  	        </div><!-- /.form-group -->
+  	        <div class="form-group">
+    	          <label class="col-md-2 control-label">Table Columns</label>
+    	          <div class="col-md-10">
+		    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+		      <li id="placeholder">
 			<input type="text" autocomplete="off" style="outline: none" placeholder="Headers">
-		    </li>
-		  </ul>
-    	        </div>
-  	      </div>
-	    </form><!-- /.form-horizontal -->
-	  </div><!-- /.container -->
+		      </li>
+		    </ul>
+    	          </div>
+  	        </div><!-- /.form-group -->
+	      </form><!-- /.form-horizontal -->
 
-          <div class="jumbotron" style="height: auto">
-	      <h1>Whiteboard</h1>
-              <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-              <p><a class="btn btn-primary btn-lg">Learn more</a></p>
-            </div>
-          </div>
+              <div class="jumbotron" style="height: auto">
+	        <h1>Whiteboard</h1>
+                <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+                <p><a class="btn btn-primary btn-lg">Learn more</a></p>
+              </div><!-- /.jumbotron -->
+            </div><!-- /#report1 -->
 
-        </div><!-- /.col-md-10 -->
-      </div><!-- /#table-workspace -->
-    </div> <!-- /.container -->
+	    <div id="report2" class="tab-pane container">
+	    </div>
+	  </div><!-- .tab-content -->
+	</div><!-- /#workspace -->
+      </div><!-- /.row -->
+    </div> <!-- /#studio -->
 {% endblock %}
