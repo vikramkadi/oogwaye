@@ -1,6 +1,28 @@
 {% extends "common/main.html" %}
 {% block content %} 
 
-The first step of creating the report, choose datasource and sql query
+<form action="step2/start" method="POST">
+<br>
+Select a Datasource:
+
+<br>
+
+<select name="datasource" id="datasource">
+{% for item in ds %}
+        <option value="{{item.id}}">{{item.name}}</option>
+{% endfor %}
+</select>
+
+<br>
+
+Enter your query:
+<br>
+<textarea id="sql" name="sql" rows="8" cols="50"></textarea>
+
+<br>
+
+<input type="submit" value="Next -> "/>
+</form>
 
 {% endblock %}
+

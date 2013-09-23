@@ -1,0 +1,5 @@
+{
+   "data_sources":[
+       {"id":"mysql-la-datacenter", "name":"mysql in LA", "host":"localhost", "port":3306, "vendor":"mysql", "db_schema_name":"test", "user":"test", "password":"test"}
+   ]
+}
