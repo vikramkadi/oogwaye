@@ -30,8 +30,10 @@ def derive_facts_dimensions(rsmd):
         colname=colinfo[0]
         coltype=colinfo[1]
         if coltype == 3:
-            dimensions.append(models.ColumnMetadata(colname, i))
+            dimensions.append(models.ColumnMetadata(colname, i, 'integer'))
         elif coltype == 253:
-            facts.append(models.ColumnMetadata(colname, i))
+            facts.append(models.ColumnMetadata(colname, i, 'string'))
+        elif coltype == None:
+            facts.append(models.ColumnMetadata(colname, i, 'string'))
        
     return facts, dimensions 
