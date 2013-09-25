@@ -23,6 +23,7 @@
     {{ super() }}
 
     <script>
+    //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
 
     var myViewTabs  = $( "#workspace .nav-tabs" );
     var myViewPanes = $( "#workspace .tab-content" );
@@ -47,6 +48,17 @@
 
     $(document).ready( function() {
 
+    $.ajax({
+            url:"/report/create/step2/pulldata", 
+            type: "POST",
+            data: {
+                   datasource: "{{ datasource }}",
+                   sql: "{{ sql }}" 
+                  },
+            success: function(result){
+                    alert(result.facts[0].colname);
+                }
+    });
       $('.sortable').sortable({
         tolerance: "pointer",
         connectWith: ".sortable",
@@ -157,7 +169,6 @@
 	    <div id="new-view" class="tab-pane container">
 	    </div>
 
-	    {% include "/report/view.html" %}
 
 	  </div><!-- .tab-content -->
 	</div><!-- /#workspace -->

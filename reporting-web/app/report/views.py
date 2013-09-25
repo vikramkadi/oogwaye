@@ -19,9 +19,9 @@ def create_report_step_2():
 
 @report_mod.route('/create/step2/start', methods=["GET","POST"])
 def create_report_step2_start():
-    result = dbhelper.pull_from_db(request.form['datasource'], request.form['sql'])
-    resp_body = jsonpickle.encode(result, unpicklable=False)
-    return flask.Response(resp_body, mimetype='application/json')
+    #result = dbhelper.pull_from_db(request.form['datasource'], request.form['sql'])
+    #resp_body = jsonpickle.encode(result, unpicklable=False)
+    return render_template('/report/table.html', sql=request.form['sql'], datasource=request.form['datasource'])
 
 @report_mod.route('/create/step2/pulldata', methods=["GET", "POST"])
 def create_report_step2_pulldata():
