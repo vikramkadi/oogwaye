@@ -11,7 +11,7 @@
       background-color: lightblue;
     }
     .form-horizontal .control-label {
-      text-align:right;
+      text-align: right;
     }
     .form-horizontal .form-group {
       margin-bottom: 0px;
@@ -25,40 +25,90 @@
     <script>
     //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
 
-    var myViewTabs  = $( "#workspace .nav-tabs" );
-    var myViewPanes = $( "#workspace .tab-content" );
+    function newDataListItem( dataItem ) {
+      listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataItem.colname );
+      badge = $( "<span></span>" ).addClass( "badge" )
+      switch ( dataItem.index ) {
+        case 1:
+        case 2:
+          $( "<i></i>" ).addClass( "icon-font icon-white" ).appendTo( badge );
+          break;
+        case 0:
+        case 3:
+          $( "<i></i>" ).addClass( "icon-signal icon-white" ).appendTo( badge );
+          break;
+        case 4:
+          $( "<i></i>" ).addClass( "icon-date icon-white" ).appendTo( badge );
+          break;
+        case 5:
+        case 6:
+          $( "<i></i>" ).addClass( "icon-usd icon-white" ).appendTo( badge );
+          break;
+        default:
+          $( "<i></i>" ).addClass( "icon-font icon-white" ).appendTo( badge );
+          break;
+      }
+      badge.appendTo( listItem );
+      return listItem[0];
+    }
 
-    function newViewPane() {
+    function newDeletableStringToken( text ) {
+          var token = $( "<li></li>" ).addClass( "token-input-token-facebook" );
+          $( "<p></p>" ).html( text ).appendTo( token );
+          $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
+            this.parentNode.remove();
+          }).appendTo( token );
+          return token[0];
+    }
+
+    function newViewTab() {
       var nviews = $( "#workspace .tab-pane" ).length - 1;
-      var viewId = "view-pane".concat(nviews.toString());
-      var viewLabel = "View Pane".concat(nviews.toString());
+      var viewId = "view-".concat(nviews.toString());
+      var viewLabel = "View ".concat(nviews.toString());
       // Create new plane by copying the template
-      var newPane = $( "#template-view" ).clone().css({
-	display: "" 
-      }).attr( "id", viewId );
-      $( "#new-view" ).before( newPane );
+      var viewPane = $( "#template-view-pane" ).clone().css({
+        display: "" 
+      }).attr( "id", viewId ).addClass( "active" );
+      // Define callback for droppable inputs
+      $( ".droppable-input", viewPane ).droppable({
+        activeClass: "ui-state-default",
+        drop: function( event, ui ) {
+          console.log(ui)
+          $("#placeholder", this).before( newDeletableStringToken( ui.draggable.text() ));
+        }
+      });
       // Create new tab by copying the template
-      var newTab = $( "#template-view-tab" ).clone().css({
-	display: ""
+      var viewTab = $( "#template-view-tab" ).clone().css({
+        display: ""
       }).attr( "id", viewId.concat("-tab") ).addClass( "active" );
-      $( "a", newTab ).attr( "href", "#".concat( viewId ) );
-      $( "#new-view-tab" ).before( newTab ).removeClass( "active" );
-      newTab.addClass( "active" );
+      $( "a", viewTab ).attr( "href", "#".concat( viewPane.attr( "id" ))).html( viewLabel );
+      // Insert into document
+      $( "#new-view-pane" ).before( viewPane );
+      $( "#new-view-tab"  ).before( viewTab  );
+      return viewTab;
+    }
+
+    function activateNewViewTab() {
+      var viewTab = newViewTab();
+      $( this ).removeClass( "active" );
+      viewTab.addClass( "active" );
     }
 
     $(document).ready( function() {
 
-    $.ajax({
-            url:"/report/create/step2/pulldata", 
-            type: "POST",
-            data: {
-                   datasource: "{{ datasource }}",
-                   sql: "{{ sql }}" 
-                  },
-            success: function(result){
-                    alert(result.facts[0].colname);
-                }
-    });
+      $.ajax({
+        url:"/report/create/step2/pulldata", 
+        type: "POST",
+        data: {
+          datasource: "{{ datasource }}",
+          sql: "{{ sql }}" 
+        },
+        success: function(result){
+          $( "#categories-list"   ).append( $.map(result.facts, newDataListItem) );
+          $( "#measurements-list" ).append( $.map(result.dimensions, newDataListItem) );
+        }
+      });
+
       $('.sortable').sortable({
         tolerance: "pointer",
         connectWith: ".sortable",
@@ -66,23 +116,12 @@
         forcePlaceholderSize: true,
         appendTo: "body",
         helper: "clone",
-	cursor: "move",
-	opacity: .8,
+        cursor: "move",
+        opacity: .8,
         zIndex: 666
       }).disableSelection();
 	
-      $( ".droppable-input" ).droppable({
-        activeClass: "ui-state-default",
-        hoverClass: "ui-state-hover",
-        drop: function( event, ui ) {
-	  var token = $( "<li></li>" ).addClass( "token-input-token-facebook" );
-	  $( "<p></p>" ).html( ui.draggable.text() ).appendTo( token );
-	  $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
-		this.parentNode.remove();
-	  }).appendTo( token );
-	  $("#placeholder", this).before( token[0] );
-        }
-      });
+      newViewTab();
 
     });
     </script>
@@ -96,82 +135,70 @@
     <div id="studio" class="bordered container theme-showcase">
       <div class="row">
         <div id="sidebar" class="col-md-2 col-xs-3" style="height: auto">
-	  <div id="headers-group" class="container">
-	    <div class="panel panel-default" style="height: auto">
-	      <div class="panel-heading">
-		<span class="panel-title">Categories</span>
-	      </div>
-	      <!-- list group -->
-	      <ul id="categories-group" class="sortable list-group">
-                <li id= "foo" class="list-group-item"><span class="badge"><i class="icon-calendar icon-white"></i></span>Date</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Vendor</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Product</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Customer</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-font icon-white"></i></span>Description</li>
-	      </ul>
+          <div id="headers-group" class="container">
+            <div class="panel panel-default" style="height: auto">
+              <div class="panel-heading">
+                <span class="panel-title">Categories</span>
+              </div>
+              <ul id="categories-list" class="sortable list-group">
+                <!-- create new list group items here -->
+              </ul>
             </div><!-- /.panel -->
 
-	    <div class="panel panel-default" style="height: auto">
-	      <div class="panel-heading">
-		<span class="panel-title">Measurements</span>
-	      </div>
-	      <!-- list group -->
-	      <ul id="measurements-group" class="sortable list-group">
-                <li class="list-group-item"><span class="badge"><i class="icon-signal icon-white"></i></span>Transactions</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Avg Sales</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Min Sales</li>
-                <li class="list-group-item"><span class="badge"><i class="icon-usd icon-white"></i></span>Max Sales</li>
-	      </ul>
+            <div class="panel panel-default" style="height: auto">
+              <div class="panel-heading">
+                <span class="panel-title">Measurements</span>
+              </div>
+              <ul id="measurements-list" class="sortable list-group">
+                <!-- create new list group items here -->
+              </ul>
             </div><!-- /.panel -->
-	  </div><!-- /#headers-group -->
+          </div><!-- /#headers-group -->
         </div><!-- /#sidebar -->
-	
+
         <div id="workspace" class="col-md-10 col-xs15 tabbable" style="height: auto">
 
-	  <ul class="nav nav-tabs">
-	    <li class="active"><a href="#view1" data-toggle="tab">View 1</a></li>
-	    <li id="new-view-tab"><a href="#new-view" data-toggle="tab" onclick="newViewPane()"><i class="icon-plus icon-white"></i></a></li>
-	    <li id="template-view-tab" style="display: none;"><a href="#template-view" data-toggle="tab">Template View</a></li>	    
-	  </ul>
+          <ul id="view-tabs" class="nav nav-tabs">
+            <li id="new-view-tab" onclick="activateNewViewTab()"><a href="#new-view-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
+            <li id="template-view-tab" style="display: none"><a href="#template-view-pane" data-toggle="tab">Template View</a></li>
+          </ul>
 
-	  <div class="tab-content"  style="height: auto">
-	    <div id="view1" class="tab-pane container active">
-	      <form class="form-horizontal" role="form">
-  	        <div class="form-group">
-    	          <label class="col-md-2 control-label">Table Rows</label>
-    	          <div class="col-md-10">
-		    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
-		      <li id="placeholder">
-			<input type="text" autocomplete="off" style="outline: none" placeholder="Headers" disabled="true">
-		      </li>
-		    </ul>
-    	          </div>
-  	        </div><!-- /.form-group -->
-  	        <div class="form-group">
-    	          <label class="col-md-2 control-label">Table Columns</label>
-    	          <div class="col-md-10">
-		    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
-		      <li id="placeholder">
-			<input type="text" autocomplete="off" style="outline: none" placeholder="Headers" disabled="true">
-		      </li>
-		    </ul>
-    	          </div>
-  	        </div><!-- /.form-group -->
-	      </form><!-- /.form-horizontal -->
-
+          <div id="view-panes" class="tab-content" style="height: auto">
+            <div id="new-view-pane" class="tab-pane container">
+            </div>
+            <div id="template-view-pane" class="tab-pane container" style="display: none">
+              <form class="form-horizontal" role="form">
+                <div class="form-group">
+                  <label class="col-md-2 control-label">Table Rows</label>
+                  <div class="col-md-10">
+                    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+                      <li id="placeholder">
+                        <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <!-- /.form-group -->
+                <div class="form-group">
+                  <label class="col-md-2 control-label">Table Columns</label>
+                  <div class="col-md-10">
+                    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+                      <li id="placeholder">
+                        <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
+                      </li>
+                    </ul>
+                  </div>
+                </div><!-- /.form-group -->
+              </form><!-- /.form-horizontal -->
               <div class="jumbotron" style="height: auto">
-	        <h1>Whiteboard</h1>
+                <h1>Whiteboard</h1>
                 <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
                 <p><a class="btn btn-primary btn-lg">Learn more</a></p>
               </div><!-- /.jumbotron -->
-            </div><!-- /#view1 -->
+            </div><!-- /#template-view-pane -->
 
-	    <div id="new-view" class="tab-pane container">
-	    </div>
-
-
-	  </div><!-- .tab-content -->
-	</div><!-- /#workspace -->
+          </div><!-- .tab-content -->
+        </div><!-- /#workspace -->
       </div><!-- /.row -->
     </div> <!-- /#studio -->
 {% endblock %}
