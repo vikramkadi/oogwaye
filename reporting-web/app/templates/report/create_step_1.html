@@ -1,5 +1,5 @@
 {% extends "common/main.html" %}
-
+{% block content %}
 <form action="step2/start" method="POST">
 <br>
 Select a Datasource:
@@ -8,7 +8,7 @@ Select a Datasource:
 
 <select name="datasource" id="datasource">
 {% for item in ds %}
-        <option value="{{item.id}}">{{item.name}}</option>
+   <option value="{{item.id}}">{{item.name}}</option>
 {% endfor %}
 </select>
 
@@ -22,4 +22,4 @@ Enter your query:
 
 <input type="submit" value="Next -> "/>
 </form>
-
+{% endblock %}
