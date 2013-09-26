@@ -8,11 +8,13 @@ def init_datasources(f):
         datasources_store = json.load(dsfile)
         datasources = datasources_store['data_sources']
 
-def init_db_engines():
+def init_db_engines(base_dir):
     global db_engines
     for ds in datasources:
         if ds['vendor'] == 'mysql':
             db_engines[ds['id']] = create_engine('mysql+mysqlconnector://' + str(ds['user']) + ':' + str(ds['password']) + '@' + str(ds['host']) + '/' + str(ds['db_schema_name']))
+        elif ds['vendor'] == 'sqlite':
+            db_engines[ds['id']] = create_engine('sqlite:///' + base_dir + '/' + str(ds['location'])) 
 
 def lookup_engine(db_id):
     return db_engines.get(db_id)

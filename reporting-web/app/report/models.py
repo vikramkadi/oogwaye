@@ -8,6 +8,7 @@ class DataPull:
         self.dimensions=dimensions
 
 class ColumnMetadata:
-    def __init__(self, colname, index):
+    def __init__(self, colname, index, coltype):
         self.colname=colname
         self.index=index
+        self.coltype=coltype
