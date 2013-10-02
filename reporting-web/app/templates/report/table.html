@@ -21,9 +21,13 @@
 
 {% block script %}
     {{ super() }}
+    <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
     <script>
     //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
+    
+    // Load google charts visualization module(s)
+    google.load('visualization', '1', {packages:['table']});
 
     function newDataListItem( dataItem ) {
       listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataItem.colname );
@@ -61,37 +65,88 @@
           return token[0];
     }
 
-    function newViewTab() {
-      var nviews = $( "#workspace .tab-pane" ).length - 1;
-      var viewId = "view-".concat(nviews.toString());
-      var viewLabel = "View ".concat(nviews.toString());
+    function newWorksheet() {
+      var nsheets = $( "#workbook .tab-pane" ).length - 1;
+      var sheetId = "worksheet-".concat(nsheets.toString());
+      var sheetLabel = "Worksheet ".concat(nsheets.toString());
       // Create new plane by copying the template
-      var viewPane = $( "#template-view-pane" ).clone().css({
+      var sheetPane = $( "#template-sheet-pane" ).clone().css({
         display: "" 
-      }).attr( "id", viewId ).addClass( "active" );
+      }).prop( "id", sheetId ).addClass( "active" );
       // Define callback for droppable inputs
-      $( ".droppable-input", viewPane ).droppable({
+      $( ".droppable-input", sheetPane ).droppable({
         activeClass: "ui-state-default",
         drop: function( event, ui ) {
-          console.log(ui)
           $("#placeholder", this).before( newDeletableStringToken( ui.draggable.text() ));
+          drawDataTable();
         }
       });
       // Create new tab by copying the template
-      var viewTab = $( "#template-view-tab" ).clone().css({
+      var sheetTab = $( "#template-sheet-tab" ).clone().css({
         display: ""
-      }).attr( "id", viewId.concat("-tab") ).addClass( "active" );
-      $( "a", viewTab ).attr( "href", "#".concat( viewPane.attr( "id" ))).html( viewLabel );
+      }).prop( "id", sheetId.concat("-tab") ).addClass( "active" );
+      $( "a", sheetTab ).prop( "href", "#".concat( sheetPane.prop( "id" ))).html( sheetLabel );
       // Insert into document
-      $( "#new-view-pane" ).before( viewPane );
-      $( "#new-view-tab"  ).before( viewTab  );
-      return viewTab;
+      $( "#new-sheet-pane" ).before( sheetPane );
+      $( "#new-sheet-tab"  ).before( sheetTab  );
+      return sheetTab;
     }
 
-    function activateNewViewTab() {
-      var viewTab = newViewTab();
-      $( this ).removeClass( "active" );
-      viewTab.addClass( "active" );
+    function activateNewWorksheet() {
+      var sheetTab = newWorksheet();
+      //$( "#new-sheet-tab" ).removeClass( "active" );
+      $( sheetTab ).addClass( "active" );
+    }
+
+    function getActiveWorksheet() {
+      var sheet = $( "#sheet-panes > .tab-pane.active" );
+      return sheet[0];
+    }
+
+    function newDataTable(sql_data) {
+      var dataTable = new google.visualization.DataTable();
+      for (var i = 0; i < sql_data.facts.length; i++) {
+        var col = sql_data.facts[i];
+        if (i==1 || i==2) {
+          col.coltype = "string";
+        } else {
+          col.coltype = "number";
+        }
+        dataTable.addColumn( col.coltype, col.colname );
+      }
+      for (var i = 0; i < sql_data.dimensions.length; i++) {
+        var col = sql_data.dimensions[i];
+        dataTable.addColumn( col.coltype, col.colname );
+      }
+      dataTable.addRows(sql_data.data);
+      return dataTable;
+    }
+
+    /*
+    function newDataTable(json_data) {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Name');
+      data.addColumn('number', 'Salary');
+      data.addColumn('boolean', 'Full Time Employee');
+      data.addRows([
+        ['Mike',  {v: 10000, f: '$10,000'}, true],
+        ['Jim',   {v:8000,   f: '$8,000'},  false],
+        ['Alice', {v: 12500, f: '$12,500'}, true],
+        ['Bob',   {v: 7000,  f: '$7,000'},  true]
+      ]);
+      return data;
+    }
+    */
+
+    function drawDataTable() {
+      var active_sheet  = getActiveWorksheet();
+      console.log( active_sheet );
+      if ( active_sheet != undefined ) {
+        var table = new google.visualization.Table( $( "#data-view", active_sheet )[0] );
+        var data  = $( "#workbook" ).prop( "dataTable" );
+        console.log( $( "#data-view", active_sheet)[0] );
+        table.draw( data );
+      }
     }
 
     $(document).ready( function() {
@@ -104,8 +159,10 @@
           sql: "{{ sql }}" 
         },
         success: function(result){
-          $( "#categories-list"   ).append( $.map(result.facts, newDataListItem) );
-          $( "#measurements-list" ).append( $.map(result.dimensions, newDataListItem) );
+          $( "#dimensions-list"   ).append( $.map(result.facts, newDataListItem) );
+          $( "#measures-list" ).append( $.map(result.dimensions, newDataListItem) );
+          console.log(result);
+          $( "#workbook" ).prop( "dataTable", newDataTable(result) );
         }
       });
 
@@ -121,7 +178,7 @@
         zIndex: 666
       }).disableSelection();
 	
-      newViewTab();
+      newWorksheet();
 
     });
     </script>
@@ -138,39 +195,39 @@
           <div id="headers-group" class="container">
             <div class="panel panel-default" style="height: auto">
               <div class="panel-heading">
-                <span class="panel-title">Categories</span>
+                <span class="panel-title">Dimensions</span>
               </div>
-              <ul id="categories-list" class="sortable list-group">
+              <ul id="dimensions-list" class="sortable list-group">
                 <!-- create new list group items here -->
               </ul>
             </div><!-- /.panel -->
 
             <div class="panel panel-default" style="height: auto">
               <div class="panel-heading">
-                <span class="panel-title">Measurements</span>
+                <span class="panel-title">Measures</span>
               </div>
-              <ul id="measurements-list" class="sortable list-group">
+              <ul id="measures-list" class="sortable list-group">
                 <!-- create new list group items here -->
               </ul>
             </div><!-- /.panel -->
           </div><!-- /#headers-group -->
         </div><!-- /#sidebar -->
 
-        <div id="workspace" class="col-md-10 col-xs15 tabbable" style="height: auto">
+        <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: auto">
 
-          <ul id="view-tabs" class="nav nav-tabs">
-            <li id="new-view-tab" onclick="activateNewViewTab()"><a href="#new-view-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
-            <li id="template-view-tab" style="display: none"><a href="#template-view-pane" data-toggle="tab">Template View</a></li>
+          <ul id="sheet-tabs" class="nav nav-tabs">
+            <li id="new-sheet-tab" onMouseUp="activateNewWorksheet()"><a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
+            <li id="template-sheet-tab" style="display: none"><a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a></li>
           </ul>
 
-          <div id="view-panes" class="tab-content" style="height: auto">
-            <div id="new-view-pane" class="tab-pane container">
+          <div id="sheet-panes" class="tab-content" style="height: auto">
+            <div id="new-sheet-pane" class="tab-pane container">
             </div>
-            <div id="template-view-pane" class="tab-pane container" style="display: none">
+            <div id="template-sheet-pane" class="tab-pane container" style="display: none">
               <form class="form-horizontal" role="form">
                 <div class="form-group">
-                  <label class="col-md-2 control-label">Table Rows</label>
-                  <div class="col-md-10">
+                  <label class="col-md-1 control-label">Rows</label>
+                  <div class="col-md-11">
                     <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
                       <li id="placeholder">
                         <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
@@ -180,8 +237,8 @@
                 </div>
                 <!-- /.form-group -->
                 <div class="form-group">
-                  <label class="col-md-2 control-label">Table Columns</label>
-                  <div class="col-md-10">
+                  <label class="col-md-1 control-label">Columns</label>
+                  <div class="col-md-11">
                     <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
                       <li id="placeholder">
                         <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
@@ -190,15 +247,12 @@
                   </div>
                 </div><!-- /.form-group -->
               </form><!-- /.form-horizontal -->
-              <div class="jumbotron" style="height: auto">
-                <h1>Whiteboard</h1>
-                <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-                <p><a class="btn btn-primary btn-lg">Learn more</a></p>
-              </div><!-- /.jumbotron -->
-            </div><!-- /#template-view-pane -->
-
+              <div class="container" style="height: auto">
+                <div id='data-view'></div>
+              </div>              
+            </div><!-- /#template-sheet-pane -->
           </div><!-- .tab-content -->
-        </div><!-- /#workspace -->
+        </div><!-- /#workbook -->
       </div><!-- /.row -->
     </div> <!-- /#studio -->
 {% endblock %}
