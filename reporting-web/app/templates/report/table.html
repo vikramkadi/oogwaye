@@ -3,6 +3,7 @@
 {% block style %}
     {{ super() }}
     <link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input-facebook.css')}}" type="text/css" />
+
     <style>
     .highlight {
       border: 1px solid red;
@@ -56,11 +57,12 @@
       return listItem[0];
     }
 
-    function newDeletableStringToken( text ) {
-          var token = $( "<li></li>" ).addClass( "token-input-token-facebook" );
-          $( "<p></p>" ).html( text ).appendTo( token );
+    function newDeletableStringToken( tokenName ) {
+          var token = $( "<li></li>" ).addClass( "token-input-token-facebook" ).attr( "id", tokenName);
+          $( "<p></p>" ).html( tokenName ).appendTo( token );
           $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
             this.parentNode.remove();
+            drawDataTable();
           }).appendTo( token );
           return token[0];
     }
@@ -98,11 +100,6 @@
       $( sheetTab ).addClass( "active" );
     }
 
-    function getActiveWorksheet() {
-      var sheet = $( "#sheet-panes > .tab-pane.active" );
-      return sheet[0];
-    }
-
     function newDataTable(sql_data) {
       var dataTable = new google.visualization.DataTable();
       for (var i = 0; i < sql_data.facts.length; i++) {
@@ -122,30 +119,48 @@
       return dataTable;
     }
 
-    /*
-    function newDataTable(json_data) {
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Name');
-      data.addColumn('number', 'Salary');
-      data.addColumn('boolean', 'Full Time Employee');
-      data.addRows([
-        ['Mike',  {v: 10000, f: '$10,000'}, true],
-        ['Jim',   {v:8000,   f: '$8,000'},  false],
-        ['Alice', {v: 12500, f: '$12,500'}, true],
-        ['Bob',   {v: 7000,  f: '$7,000'},  true]
-      ]);
-      return data;
+    function getDataTable() {
+       var dataTable  = $( "#workbook" ).prop( "dataTable" );
+       return dataTable;
     }
-    */
 
+    function getActiveWorksheet() {
+      var sheet = $( "#sheet-panes > .tab-pane.active" );
+      return sheet[0];
+    }
+
+    // Return array of dimensions stored for given view
+    function getViewDimensions( this_sheet ) {
+      var dimensions = $( "ul .token-input-token-facebook", this_sheet ).map( function() {
+        return this.id;
+      }).get();
+      return dimensions;
+    }
+
+    // Given array of column names, find corresponding indeces into dataTable
+    function getDataTableColumnIndeces( colNames, dataTable) {
+      var colIndeces = $( colNames ).map( function() {
+        for ( var i = 0; i < dataTable.H.length; i++ ) {
+          if ( this == dataTable.H[i].label ) return i;
+        }
+        return; // Name not found, return nothing
+      }).get();
+      return colIndeces;
+    }
+
+    // Draw routine and main entry point for displaying data
     function drawDataTable() {
-      var active_sheet  = getActiveWorksheet();
-      console.log( active_sheet );
-      if ( active_sheet != undefined ) {
-        var table = new google.visualization.Table( $( "#data-view", active_sheet )[0] );
-        var data  = $( "#workbook" ).prop( "dataTable" );
-        console.log( $( "#data-view", active_sheet)[0] );
-        table.draw( data );
+      var this_sheet = getActiveWorksheet();
+      var dataTable  = getDataTable();
+      if ( this_sheet != undefined && dataTable != undefined ) {
+        // Get column names then find their corresponding table indeces
+        var dimensions = getViewDimensions( this_sheet );
+        var colIndeces = getDataTableColumnIndeces( dimensions, dataTable );
+        // Create dataView and display in view pane
+        var viewpane = new google.visualization.Table( $( "#data-view", this_sheet )[0] );
+        var dataView = new google.visualization.DataView( dataTable );
+        dataView.setColumns( colIndeces );
+        viewpane.draw( dataView );
       }
     }
 
@@ -158,10 +173,9 @@
           datasource: "{{ datasource }}",
           sql: "{{ sql }}" 
         },
-        success: function(result){
+        success: function( result ){
           $( "#dimensions-list"   ).append( $.map(result.facts, newDataListItem) );
           $( "#measures-list" ).append( $.map(result.dimensions, newDataListItem) );
-          console.log(result);
           $( "#workbook" ).prop( "dataTable", newDataTable(result) );
         }
       });
