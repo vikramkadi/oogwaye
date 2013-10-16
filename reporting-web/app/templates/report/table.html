@@ -30,31 +30,45 @@
     // Load google charts visualization module(s)
     google.load('visualization', '1', {packages:['table']});
 
-    function newDataListItem( dataItem ) {
-      listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataItem.colname );
+    function newDataListItem( dataName, dataType ) {
+      listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName );
       badge = $( "<span></span>" ).addClass( "badge" )
-      switch ( dataItem.index ) {
-        case 1:
-        case 2:
-          $( "<i></i>" ).addClass( "icon-font icon-white" ).appendTo( badge );
-          break;
-        case 0:
-        case 3:
+      switch ( dataType ) {
+        case "number":
           $( "<i></i>" ).addClass( "icon-signal icon-white" ).appendTo( badge );
           break;
-        case 4:
+        case "date":
+        case "timeofday":
+        case "datetime":
           $( "<i></i>" ).addClass( "icon-date icon-white" ).appendTo( badge );
           break;
-        case 5:
-        case 6:
+        case "string":
+           $( "<i></i>" ).addClass( "icon-font icon-white" ).appendTo( badge );
+          break;         
+        case "money":
           $( "<i></i>" ).addClass( "icon-usd icon-white" ).appendTo( badge );
           break;
+        case "boolean":
         default:
-          $( "<i></i>" ).addClass( "icon-font icon-white" ).appendTo( badge );
+          $( "<i></i>" ).addClass( "icon-question-sign icon-white" ).appendTo( badge );
           break;
       }
       badge.appendTo( listItem );
       return listItem[0];
+    }
+
+    function newDimensionsListItem( dataObject ) {
+      if ( dataObject.type.toLowerCase() != "number" ) {
+        return newDataListItem( dataObject.name, dataObject.type.toLowerCase() );
+      }
+      return;
+    }
+
+    function newMeasuresListItem( dataObject ) {
+      if ( dataObject.type.toLowerCase() == "number" ) {
+        return newDataListItem( dataObject.name, dataObject.type.toLowerCase() );
+      }
+      return;
     }
 
     function newDeletableStringToken( tokenName ) {
@@ -100,6 +114,25 @@
       $( sheetTab ).addClass( "active" );
     }
 
+    function fusionTableColumns( tableId, apiKey ) {
+      // Construct query
+      var url = 'https://www.googleapis.com/fusiontables/v1/tables/' + tableId;
+      url += '?key=' + apiKey;
+      return url;
+    }
+
+    function fusionTableData( tableId, apiKey ) {
+      // Construct query
+      var query = 'SELECT * FROM ' + tableId;
+      // Construct the URL
+      var url = [ 'https://www.googleapis.com/fusiontables/v1/query' ];
+      url.push( '?sql=' + encodeURIComponent( query ) );
+      url.push( '&key=' + apiKey );
+      //url.push( '&typed=true' );
+      return url.join('');
+    }
+
+    /*
     function newDataTable(sql_data) {
       var dataTable = new google.visualization.DataTable();
       for (var i = 0; i < sql_data.facts.length; i++) {
@@ -117,6 +150,52 @@
       }
       dataTable.addRows(sql_data.data);
       return dataTable;
+    }
+    */
+    function newDataTable( json ) {
+      console.log( json );
+      var dataTable = new google.visualization.DataTable();
+      for (var i = 0; i < json.columns.length; i++) {
+        var dataObject = json.columns[i];
+        var dataType   = dataObject.type.toLowerCase();
+        switch ( dataType ) {
+          case 'boolean':
+          case 'date':
+          case 'datetime':
+          case 'number':
+          case 'string':
+          case 'timeofday':
+            break;
+          case 'location':
+          default:
+            dataType = 'string';
+            break;
+        }
+        dataTable.addColumn( dataType, dataObject.name, i );
+      }
+      $( "#workbook" ).prop( "dataTable", dataTable );
+      return dataTable;
+    }
+
+    function loadDataTable( dataTable, json ) {
+      console.log( json );
+      for ( var i = 0; i < json.rows.length; i++ ) {
+        var encodedRow = $( json.rows[i] ).map( function( sval, index ) {
+          switch ( dataTable.getColumnType( index) ) {
+            case 'boolean':
+              return parseInt( sval );
+              break;
+            case 'number':
+              return 
+            case 'date':
+              break;
+          }
+        }
+      });
+      //dataTable.addRows( json.rows );
+      return dataTable;
+      //$( "#workbook" ).prop( "dataTable", newDataTable( json ) );
+      //console.log( getDataTable() );
     }
 
     function getDataTable() {
@@ -166,6 +245,7 @@
 
     $(document).ready( function() {
 
+      /*
       $.ajax({
         url:"/report/create/step2/pulldata", 
         type: "POST",
@@ -178,6 +258,21 @@
           $( "#measures-list" ).append( $.map(result.dimensions, newDataListItem) );
           $( "#workbook" ).prop( "dataTable", newDataTable(result) );
         }
+      });
+      */
+
+      var dataTable = undefined;
+      var tableId = '1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0';
+      var apiKey  = 'AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM';
+
+      $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
+        dataTable = newDataTable( json );
+        $( "#dimensions-list" ).append( $.map(json.columns, newDimensionsListItem) );
+        $( "#measures-list" ).append( $.map(json.columns, newMeasuresListItem) );
+      });
+
+      $.get( fusionTableData( tableId, apiKey ), function( json ) {
+        loadDataTable( dataTable, json );
       });
 
       $('.sortable').sortable({
