@@ -23,34 +23,46 @@
 {% block script %}
     {{ super() }}
     <script type="text/javascript" src="//www.google.com/jsapi"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/report/dataTable.js')}}"></script>
 
     <script>
     //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
     
     // Load google charts visualization module(s)
-    google.load('visualization', '1', {packages:['table']});
+    google.load("visualization", "1", {packages:["table"]});
 
     function newDataListItem( dataName, dataType ) {
-      listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName );
-      badge = $( "<span></span>" ).addClass( "badge" )
+      var listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName );
+      var badge = $( "<span></span>" ).addClass( "badge" ).css({
+        "font-size":   "10px",
+        "font-weight": "normal"
+      });
       switch ( dataType ) {
-        case "number":
-          $( "<i></i>" ).addClass( "icon-signal icon-white" ).appendTo( badge );
+        case "boolean":
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
           break;
         case "date":
-        case "timeofday":
         case "datetime":
-          $( "<i></i>" ).addClass( "icon-date icon-white" ).appendTo( badge );
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-calendar" ).appendTo( badge );
+          break; 
+        case "location":
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-road" ).appendTo( badge );
+          break;    
+        case "money":
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-usd icon-white" ).appendTo( badge );
+          break;
+        case "number":
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-signal" ).appendTo( badge );
           break;
         case "string":
-           $( "<i></i>" ).addClass( "icon-font icon-white" ).appendTo( badge );
-          break;         
-        case "money":
-          $( "<i></i>" ).addClass( "icon-usd icon-white" ).appendTo( badge );
-          break;
-        case "boolean":
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-font" ).appendTo( badge );
+          break; 
+        case "timeofday":
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-time" ).appendTo( badge );
+          break;  
         default:
-          $( "<i></i>" ).addClass( "icon-question-sign icon-white" ).appendTo( badge );
+          $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
           break;
       }
       badge.appendTo( listItem );
@@ -114,91 +126,7 @@
       $( sheetTab ).addClass( "active" );
     }
 
-    function fusionTableColumns( tableId, apiKey ) {
-      // Construct query
-      var url = 'https://www.googleapis.com/fusiontables/v1/tables/' + tableId;
-      url += '?key=' + apiKey;
-      return url;
-    }
-
-    function fusionTableData( tableId, apiKey ) {
-      // Construct query
-      var query = 'SELECT * FROM ' + tableId;
-      // Construct the URL
-      var url = [ 'https://www.googleapis.com/fusiontables/v1/query' ];
-      url.push( '?sql=' + encodeURIComponent( query ) );
-      url.push( '&key=' + apiKey );
-      //url.push( '&typed=true' );
-      return url.join('');
-    }
-
-    /*
-    function newDataTable(sql_data) {
-      var dataTable = new google.visualization.DataTable();
-      for (var i = 0; i < sql_data.facts.length; i++) {
-        var col = sql_data.facts[i];
-        if (i==1 || i==2) {
-          col.coltype = "string";
-        } else {
-          col.coltype = "number";
-        }
-        dataTable.addColumn( col.coltype, col.colname );
-      }
-      for (var i = 0; i < sql_data.dimensions.length; i++) {
-        var col = sql_data.dimensions[i];
-        dataTable.addColumn( col.coltype, col.colname );
-      }
-      dataTable.addRows(sql_data.data);
-      return dataTable;
-    }
-    */
-    function newDataTable( json ) {
-      console.log( json );
-      var dataTable = new google.visualization.DataTable();
-      for (var i = 0; i < json.columns.length; i++) {
-        var dataObject = json.columns[i];
-        var dataType   = dataObject.type.toLowerCase();
-        switch ( dataType ) {
-          case 'boolean':
-          case 'date':
-          case 'datetime':
-          case 'number':
-          case 'string':
-          case 'timeofday':
-            break;
-          case 'location':
-          default:
-            dataType = 'string';
-            break;
-        }
-        dataTable.addColumn( dataType, dataObject.name, i );
-      }
-      $( "#workbook" ).prop( "dataTable", dataTable );
-      return dataTable;
-    }
-
-    function loadDataTable( dataTable, json ) {
-      console.log( json );
-      for ( var i = 0; i < json.rows.length; i++ ) {
-        var encodedRow = $( json.rows[i] ).map( function( sval, index ) {
-          switch ( dataTable.getColumnType( index) ) {
-            case 'boolean':
-              return parseInt( sval );
-              break;
-            case 'number':
-              return 
-            case 'date':
-              break;
-          }
-        }
-      });
-      //dataTable.addRows( json.rows );
-      return dataTable;
-      //$( "#workbook" ).prop( "dataTable", newDataTable( json ) );
-      //console.log( getDataTable() );
-    }
-
-    function getDataTable() {
+    function getActiveDataTable() {
        var dataTable  = $( "#workbook" ).prop( "dataTable" );
        return dataTable;
     }
@@ -216,21 +144,10 @@
       return dimensions;
     }
 
-    // Given array of column names, find corresponding indeces into dataTable
-    function getDataTableColumnIndeces( colNames, dataTable) {
-      var colIndeces = $( colNames ).map( function() {
-        for ( var i = 0; i < dataTable.H.length; i++ ) {
-          if ( this == dataTable.H[i].label ) return i;
-        }
-        return; // Name not found, return nothing
-      }).get();
-      return colIndeces;
-    }
-
     // Draw routine and main entry point for displaying data
     function drawDataTable() {
       var this_sheet = getActiveWorksheet();
-      var dataTable  = getDataTable();
+      var dataTable  = getActiveDataTable();
       if ( this_sheet != undefined && dataTable != undefined ) {
         // Get column names then find their corresponding table indeces
         var dimensions = getViewDimensions( this_sheet );
@@ -261,21 +178,34 @@
       });
       */
 
+      // Create UI layout for displaying data-fields
+      var dataFieldsPane = $( "#data-fields-pane" ).layout({
+        applyDefaultStyles: true,
+        north__minSize: 100,
+        north__maxSize:   0,
+        center__minSize:100,
+        center__maxSize:  0
+      });
+
+      // Get column headers from fusion table and populate data-fields pane
       var dataTable = undefined;
-      var tableId = '1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0';
-      var apiKey  = 'AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM';
+      var tableId = "1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0";
+      var apiKey  = "AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM";
 
       $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
         dataTable = newDataTable( json );
-        $( "#dimensions-list" ).append( $.map(json.columns, newDimensionsListItem) );
-        $( "#measures-list" ).append( $.map(json.columns, newMeasuresListItem) );
+        var dimensions = $( "#dimensions-list" ).append( $.map(json.columns, newDimensionsListItem) );
+        var measures   = $( "#measures-list" ).append( $.map(json.columns, newMeasuresListItem) );
+        dataFieldsPane.resizeAll();
       });
 
+      // Get fusion table data to populate dataTable object
       $.get( fusionTableData( tableId, apiKey ), function( json ) {
         loadDataTable( dataTable, json );
       });
 
-      $('.sortable').sortable({
+      // Make data fie
+      $( ".sortable" ).sortable({
         tolerance: "pointer",
         connectWith: ".sortable",
         placeholder: "list-group-item",
@@ -287,6 +217,7 @@
         zIndex: 666
       }).disableSelection();
 	
+      // Initialize work area with blank worksheet
       newWorksheet();
 
     });
@@ -299,27 +230,32 @@
 
 {% block content %}
     <div id="studio" class="bordered container theme-showcase">
-      <div class="row">
-        <div id="sidebar" class="col-md-2 col-xs-3" style="height: auto">
-          <div id="headers-group" class="container">
-            <div class="panel panel-default" style="height: auto">
-              <div class="panel-heading">
-                <span class="panel-title">Dimensions</span>
+      <div class="row" style="height: 100%">
+        <div id="sidebar" class="col-md-2 col-xs-3" style="height: 100%">
+          <nav class="navbar" role="navigation" style="margin-bottom: 7px">
+          </nav>
+          <div id="data-fields-pane" style="height: 94%">
+            <div class="ui-layout-north">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <span class="panel-title">Dimensions</span>
+                </div>
+                <ul id="dimensions-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
+                  <!-- create new list group items here -->
+                </ul>
               </div>
-              <ul id="dimensions-list" class="sortable list-group">
-                <!-- create new list group items here -->
-              </ul>
-            </div><!-- /.panel -->
-
-            <div class="panel panel-default" style="height: auto">
+            </div><!-- /.ui-layout-north -->
+            <div class="ui-layout-center">
+              <div class="panel panel-default">
               <div class="panel-heading">
                 <span class="panel-title">Measures</span>
               </div>
-              <ul id="measures-list" class="sortable list-group">
+              <ul id="measures-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
                 <!-- create new list group items here -->
               </ul>
-            </div><!-- /.panel -->
-          </div><!-- /#headers-group -->
+              </div><!-- /.panel -->
+            </div><!-- /.ui-layout-center -->
+          </div><!-- /#data-fields-pane -->
         </div><!-- /#sidebar -->
 
         <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: auto">
@@ -335,7 +271,7 @@
             <div id="template-sheet-pane" class="tab-pane container" style="display: none">
               <form class="form-horizontal" role="form">
                 <div class="form-group">
-                  <label class="col-md-1 control-label">Rows</label>
+                  <label class="col-md-1 control-label">Columns</label>
                   <div class="col-md-11">
                     <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
                       <li id="placeholder">
@@ -346,7 +282,7 @@
                 </div>
                 <!-- /.form-group -->
                 <div class="form-group">
-                  <label class="col-md-1 control-label">Columns</label>
+                  <label class="col-md-1 control-label">Rows</label>
                   <div class="col-md-11">
                     <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
                       <li id="placeholder">
@@ -357,7 +293,7 @@
                 </div><!-- /.form-group -->
               </form><!-- /.form-horizontal -->
               <div class="container" style="height: auto">
-                <div id='data-view'></div>
+                <div id="data-view"></div>
               </div>              
             </div><!-- /#template-sheet-pane -->
           </div><!-- .tab-content -->
