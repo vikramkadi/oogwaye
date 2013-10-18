@@ -11,11 +11,18 @@
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
-
     <!-- Bootstrap theme -->
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
 
     {% block style %}
+    <!-- Maximize display width -->
+    <style>
+        @media all {
+        .container {
+            max-width: 97.5%;
+        }
+    }
+    </style>
     <!-- Custom styles for this template -->
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/common/main.css')}}">
     {% endblock style %}
@@ -32,19 +39,13 @@
 
     {% block script %}
     <script type="text/javascript">
-      $( document ).ready( function() {
-        // Adjust height of workspace panels to cover full screen
-	/*
-        $("#studio [class*='col-md-']").each(function() {
-	  var golden_ratio = 1.62;
-	  $(this).height($("#studio").width()/golden_ratio);
-        });
-	*/
+        $( document ).ready( function() {
+            // Adjust height of workspace panels to cover full screen
 	       $( "#studio" ).each(function() {
 	           var golden_ratio = 1.62;
 	           $( this ).height( $( this ).width() / golden_ratio );
-           });
-       });
+            });
+        });
     </script>
     {% endblock script %}
 
