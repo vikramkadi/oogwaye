@@ -2,22 +2,6 @@
 
 {% block style %}
     {{ super() }}
-    <link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input-facebook.css')}}" type="text/css" />
-
-    <style>
-    .highlight {
-      border: 1px solid red;
-      font-weight: bold;
-      font-size: 45px;
-      background-color: lightblue;
-    }
-    .form-horizontal .control-label {
-      text-align: right;
-    }
-    .form-horizontal .form-group {
-      margin-bottom: 0px;
-    }
-    </style>
 {% endblock style %}
 
 {% block script %}
@@ -32,67 +16,6 @@
     // Load google charts visualization module(s)
     google.load("visualization", "1", {packages:["table"]});
 
-    function newDataListItem( dataName, dataType ) {
-      var listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName );
-      var badge = $( "<span></span>" ).addClass( "badge" ).css({
-        "font-size":   "10px",
-        "font-weight": "normal"
-      });
-      switch ( dataType ) {
-        case "boolean":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
-          break;
-        case "date":
-        case "datetime":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-calendar" ).appendTo( badge );
-          break; 
-        case "location":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-road" ).appendTo( badge );
-          break;    
-        case "money":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-usd icon-white" ).appendTo( badge );
-          break;
-        case "number":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-signal" ).appendTo( badge );
-          break;
-        case "string":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-font" ).appendTo( badge );
-          break; 
-        case "timeofday":
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-time" ).appendTo( badge );
-          break;  
-        default:
-          $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
-          break;
-      }
-      badge.appendTo( listItem );
-      return listItem[0];
-    }
-
-    function newDimensionsListItem( dataObject ) {
-      if ( dataObject.type.toLowerCase() != "number" ) {
-        return newDataListItem( dataObject.name, dataObject.type.toLowerCase() );
-      }
-      return;
-    }
-
-    function newMeasuresListItem( dataObject ) {
-      if ( dataObject.type.toLowerCase() == "number" ) {
-        return newDataListItem( dataObject.name, dataObject.type.toLowerCase() );
-      }
-      return;
-    }
-
-    function newDeletableStringToken( tokenName ) {
-          var token = $( "<li></li>" ).addClass( "token-input-token-facebook" ).attr( "id", tokenName);
-          $( "<p></p>" ).html( tokenName ).appendTo( token );
-          $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
-            this.parentNode.remove();
-            drawDataTable();
-          }).appendTo( token );
-          return token[0];
-    }
-
     function newWorksheet() {
       var nsheets = $( "#workbook .tab-pane" ).length - 1;
       var sheetId = "worksheet-".concat(nsheets.toString());
@@ -101,14 +24,7 @@
       var sheetPane = $( "#template-sheet-pane" ).clone().css({
         display: "" 
       }).prop( "id", sheetId ).addClass( "active" );
-      // Define callback for droppable inputs
-      $( ".droppable-input", sheetPane ).droppable({
-        activeClass: "ui-state-default",
-        drop: function( event, ui ) {
-          $("#placeholder", this).before( newDeletableStringToken( ui.draggable.text() ));
-          drawDataTable();
-        }
-      });
+      initDataDrop( sheetPane );
       // Create new tab by copying the template
       var sheetTab = $( "#template-sheet-tab" ).clone().css({
         display: ""
@@ -136,24 +52,16 @@
       return sheet[0];
     }
 
-    // Return array of dimensions stored for given view
-    function getViewDimensions( this_sheet ) {
-      var dimensions = $( "ul .token-input-token-facebook", this_sheet ).map( function() {
-        return this.id;
-      }).get();
-      return dimensions;
-    }
-
     // Draw routine and main entry point for displaying data
     function drawDataTable() {
-      var this_sheet = getActiveWorksheet();
-      var dataTable  = getActiveDataTable();
-      if ( this_sheet != undefined && dataTable != undefined ) {
+      var thisSheet = getActiveWorksheet();
+      var dataTable = getActiveDataTable();
+      if ( thisSheet != undefined && dataTable != undefined ) {
         // Get column names then find their corresponding table indeces
-        var dimensions = getViewDimensions( this_sheet );
+        var dimensions = getViewDimensions( thisSheet );
         var colIndeces = getDataTableColumnIndeces( dimensions, dataTable );
         // Create dataView and display in view pane
-        var viewpane = new google.visualization.Table( $( "#data-view", this_sheet )[0] );
+        var viewpane = new google.visualization.Table( $( "#data-view", thisSheet )[0] );
         var dataView = new google.visualization.DataView( dataTable );
         dataView.setColumns( colIndeces );
         viewpane.draw( dataView );
@@ -178,44 +86,21 @@
       });
       */
 
-      // Create UI layout for displaying data-fields
-      var dataFieldsPane = $( "#data-fields-pane" ).layout({
-        applyDefaultStyles: true,
-        north__minSize: 100,
-        north__maxSize:   0,
-        center__minSize:100,
-        center__maxSize:  0
-      });
-
       // Get column headers from fusion table and populate data-fields pane
-      var dataTable = undefined;
       var tableId = "1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0";
       var apiKey  = "AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM";
 
       $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
-        dataTable = newDataTable( json );
+        $( "#workbook" ).prop( "dataTable", newDataTable( json ) );
         var dimensions = $( "#dimensions-list" ).append( $.map(json.columns, newDimensionsListItem) );
         var measures   = $( "#measures-list" ).append( $.map(json.columns, newMeasuresListItem) );
-        dataFieldsPane.resizeAll();
+        updateDataStore();
       });
 
       // Get fusion table data to populate dataTable object
       $.get( fusionTableData( tableId, apiKey ), function( json ) {
-        loadDataTable( dataTable, json );
+        loadDataTable( getActiveDataTable(), json );
       });
-
-      // Make data fie
-      $( ".sortable" ).sortable({
-        tolerance: "pointer",
-        connectWith: ".sortable",
-        placeholder: "list-group-item",
-        forcePlaceholderSize: true,
-        appendTo: "body",
-        helper: "clone",
-        cursor: "move",
-        opacity: .8,
-        zIndex: 666
-      }).disableSelection();
 	
       // Initialize work area with blank worksheet
       newWorksheet();
@@ -232,66 +117,18 @@
     <div id="studio" class="bordered container theme-showcase">
       <div class="row" style="height: 100%">
         <div id="sidebar" class="col-md-2 col-xs-3" style="height: 100%">
-          <nav class="navbar" role="navigation" style="margin-bottom: 7px">
-          </nav>
-          <div id="data-fields-pane" style="height: 94%">
-            <div class="ui-layout-north">
-              <div class="panel panel-default">
-                <div class="panel-heading">
-                  <span class="panel-title">Dimensions</span>
-                </div>
-                <ul id="dimensions-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
-                  <!-- create new list group items here -->
-                </ul>
-              </div>
-            </div><!-- /.ui-layout-north -->
-            <div class="ui-layout-center">
-              <div class="panel panel-default">
-              <div class="panel-heading">
-                <span class="panel-title">Measures</span>
-              </div>
-              <ul id="measures-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
-                <!-- create new list group items here -->
-              </ul>
-              </div><!-- /.panel -->
-            </div><!-- /.ui-layout-center -->
-          </div><!-- /#data-fields-pane -->
-        </div><!-- /#sidebar -->
-
+          {% include "/report/data_store.html" %}
+        </div>
         <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: auto">
-
           <ul id="sheet-tabs" class="nav nav-tabs">
             <li id="new-sheet-tab" onMouseUp="activateNewWorksheet()"><a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
             <li id="template-sheet-tab" style="display: none"><a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a></li>
           </ul>
-
           <div id="sheet-panes" class="tab-content" style="height: auto">
             <div id="new-sheet-pane" class="tab-pane container">
             </div>
             <div id="template-sheet-pane" class="tab-pane container" style="display: none">
-              <form class="form-horizontal" role="form">
-                <div class="form-group">
-                  <label class="col-md-1 control-label">Columns</label>
-                  <div class="col-md-11">
-                    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
-                      <li id="placeholder">
-                        <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <!-- /.form-group -->
-                <div class="form-group">
-                  <label class="col-md-1 control-label">Rows</label>
-                  <div class="col-md-11">
-                    <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
-                      <li id="placeholder">
-                        <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
-                      </li>
-                    </ul>
-                  </div>
-                </div><!-- /.form-group -->
-              </form><!-- /.form-horizontal -->
+              {% include "/report/data_drop.html" %}
               <div class="container" style="height: auto">
                 <div id="data-view"></div>
               </div>              
