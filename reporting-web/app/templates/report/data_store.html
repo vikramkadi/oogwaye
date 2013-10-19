@@ -1,0 +1,123 @@
+<!--
+data_store.html:
+Implements Data Store container window.  The Data Store organizes data into lists,
+Dimensions and Measures, as candidates for display.
+/-->
+<script>
+
+  function newDataListItem( dataName, dataType ) {
+    var listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName );
+    var badge = $( "<span></span>" ).addClass( "badge" ).css({
+      "font-size":   "10px",
+      "font-weight": "normal"
+    });
+    switch ( dataType ) {
+      case "boolean":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
+        break;
+      case "date":
+      case "datetime":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-calendar" ).appendTo( badge );
+        break; 
+      case "location":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-road" ).appendTo( badge );
+        break;    
+      case "money":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-usd icon-white" ).appendTo( badge );
+        break;
+      case "number":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-signal" ).appendTo( badge );
+        break;
+      case "string":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-font" ).appendTo( badge );
+        break; 
+      case "timeofday":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-time" ).appendTo( badge );
+        break;  
+      default:
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
+        break;
+    }
+    badge.appendTo( listItem );
+    return listItem[0];
+  }
+
+  function newDimensionsListItem( dataObject ) {
+    if ( dataObject.type.toLowerCase() != "number" ) {
+      return newDataListItem( dataObject.name, dataObject.type.toLowerCase() );
+    }
+    return;
+  }
+
+  function newMeasuresListItem( dataObject ) {
+    if ( dataObject.type.toLowerCase() == "number" ) {
+      return newDataListItem( dataObject.name, dataObject.type.toLowerCase() );
+    }
+    return;
+  }
+
+  function updateDataStore() {
+    var dataPaneLayout = $( "#data-store" ).prop( "layout" );
+    if ( dataPaneLayout != undefined ) {
+      dataPaneLayout.resizeAll();
+    }
+  }
+
+  $(document).ready( function() {
+
+    // Create UI layout for displaying data fields
+    var dataPaneLayout = $( "#data-pane" ).layout({
+      applyDefaultStyles: true,
+      north__minSize: 100,
+      north__maxSize:   0,
+      center__minSize:100,
+      center__maxSize:  0
+    });
+
+    $( "#data-store" ).prop( "layout", dataPaneLayout );
+
+    // Make list item sortable
+    $( ".sortable" ).sortable({
+      tolerance: "pointer",
+      connectWith: ".sortable",
+      placeholder: "list-group-item",
+      forcePlaceholderSize: true,
+      appendTo: "body",
+      helper: "clone",
+      cursor: "move",
+      opacity: .8,
+      zIndex: 666
+    }).disableSelection();
+  });
+
+</script>
+    
+<div id="data-store" style="height: 100%">
+  <nav class="navbar" role="navigation" style="margin-bottom: 7px">
+  </nav>
+  <div id="data-pane" style="height: 94%">
+    <div class="ui-layout-north">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title">Dimensions</span>
+        </div>
+        <ul id="dimensions-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
+          <!-- create new list group items here -->
+        </ul>
+      </div>
+    </div><!-- /.ui-layout-north -->
+    <div class="ui-layout-center">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <span class="panel-title">Measures</span>
+        </div>
+        <ul id="measures-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
+          <!-- create new list group items here -->
+        </ul>
+      </div><!-- /.panel -->
+    </div><!-- /.ui-layout-center -->
+  </div><!-- /#data-pane -->
+</div><!-- /#data-store -->
+
+
+

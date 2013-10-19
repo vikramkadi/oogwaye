@@ -1,0 +1,73 @@
+<!--
+data_drop.html:
+Implements drop boxes for data fields. Data dropped in these boxes are readied
+for display.
+/-->
+<link rel="stylesheet" href="{{url_for('static', filename='js/libs/jquery-tokeninput/styles/token-input-facebook.css')}}" type="text/css" />
+
+<style>
+  .form-horizontal .control-label {
+    text-align: right;
+  }
+  .form-horizontal .form-group {
+    margin-bottom: 0px;
+  }
+</style>
+
+<script>
+
+  function newDeletableStringToken( tokenName ) {
+    var token = $( "<li></li>" ).addClass( "token-input-token-facebook" ).attr( "id", tokenName);
+    $( "<p></p>" ).html( tokenName ).appendTo( token );
+    $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
+      this.parentNode.remove();
+      drawDataTable();
+    }).appendTo( token );
+    return token[0];
+  }
+
+  function initDataDrop( domContext ) {
+    // Define callback for droppable inputs
+    $( ".droppable-input", domContext ).droppable({
+      activeClass: "ui-state-default",
+      drop: function( event, ui ) {
+        $("#placeholder", this).before( newDeletableStringToken( ui.draggable.text() ));
+        drawDataTable();
+      }
+    });
+  }
+
+  // Return array of dimensions stored for given view
+  function getViewDimensions( domContext ) {
+    var dimensions = $( "ul .token-input-token-facebook", domContext ).map( function() {
+      return this.id;
+    }).get();
+    return dimensions;
+  }
+
+</script>
+
+<div id="data-drop>"
+  <form class="form-horizontal" role="form">
+    <div class="form-group">
+      <label class="col-md-1 control-label">Columns</label>
+      <div class="col-md-11">
+        <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+          <li id="placeholder">
+            <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
+          </li>
+        </ul>
+      </div>
+    </div><!-- /.form-group -->
+    <div class="form-group">
+      <label class="col-md-1 control-label">Rows</label>
+      <div class="col-md-11">
+        <ul class="droppable-input token-input-list-facebook" style="width: auto; height: auto;">
+          <li id="placeholder">
+            <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
+          </li>
+        </ul>
+      </div>
+    </div><!-- /.form-group -->
+  </form><!-- /.form-horizontal -->
+</div><!-- /#data-drop -->
