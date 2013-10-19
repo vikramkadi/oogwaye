@@ -8,7 +8,7 @@
     {{ super() }}
     <script type="text/javascript" src="//www.google.com/jsapi"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='js/report/dataTable.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/report/gdata_table.js')}}"></script>
 
     <script>
     //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
@@ -94,7 +94,7 @@
         $( "#workbook" ).prop( "dataTable", newDataTable( json ) );
         var dimensions = $( "#dimensions-list" ).append( $.map(json.columns, newDimensionsListItem) );
         var measures   = $( "#measures-list" ).append( $.map(json.columns, newMeasuresListItem) );
-        updateDataStore();
+        initDataStore();
       });
 
       // Get fusion table data to populate dataTable object
