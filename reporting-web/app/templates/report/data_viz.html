@@ -1,0 +1,24 @@
+<script type="text/javascript" src="//www.google.com/jsapi"></script>
+ 
+<script>
+ 
+	// Load google charts visualization module(s)
+    google.load("visualization", "1", {packages:["table"]});
+    google.load("visualization", "1", {packages:["corechart"]});
+
+    // Display data in table
+    function drawTable( dom, dataView ) {
+        // Create dataView and display in view pane
+        var table = new google.visualization.Table( dom );
+        table.draw( dataView, {  width: toString(dom.clientWidth), height: toString(dom.clientWidth) } );
+    }
+
+    function drawLineChart( dom, dataView ) {
+        var options = {
+          title: 'Company Performance'
+        };
+        var chart = new google.visualization.LineChart( dom );
+        chart.draw( dataView, options );
+    }
+
+</script>
