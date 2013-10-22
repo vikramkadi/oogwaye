@@ -12,9 +12,6 @@
 
     <script>
     //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
-    
-    // Load google charts visualization module(s)
-    google.load("visualization", "1", {packages:["table"]});
 
     function newWorksheet() {
       var nsheets = $( "#workbook .tab-pane" ).length - 1;
@@ -52,8 +49,8 @@
       return sheet[0];
     }
 
-    // Draw routine and main entry point for displaying data
-    function drawDataTable() {
+    // Main entry point for updating data display
+    function updateView() {
       var thisSheet = getActiveWorksheet();
       var dataTable = getActiveDataTable();
       if ( thisSheet != undefined && dataTable != undefined ) {
@@ -61,10 +58,12 @@
         var dimensions = getViewDimensions( thisSheet );
         var colIndeces = getDataTableColumnIndeces( dimensions, dataTable );
         // Create dataView and display in view pane
-        var viewpane = new google.visualization.Table( $( "#data-view", thisSheet )[0] );
         var dataView = new google.visualization.DataView( dataTable );
         dataView.setColumns( colIndeces );
-        viewpane.draw( dataView );
+
+        var thisView = $( "#data-view", thisSheet )[0];
+        //drawTable( thisView, dataTable, colIndeces, [] );
+        drawLineChart( thisView, dataView );
       }
     }
 
@@ -87,7 +86,8 @@
       */
 
       // Get column headers from fusion table and populate data-fields pane
-      var tableId = "1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0";
+      // var tableId = "1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0";
+      var tableId = "1n8licSOEIjVhmpfeg698VJUt1q9iyizM-yN5Szc";
       var apiKey  = "AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM";
 
       $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
@@ -114,23 +114,25 @@
 {% endblock header %}
 
 {% block content %}
+
+    {% include "/report/data_viz.html" %}
     <div id="studio" class="bordered container theme-showcase">
       <div class="row" style="height: 100%">
         <div id="sidebar" class="col-md-2 col-xs-3" style="height: 100%">
           {% include "/report/data_store.html" %}
         </div>
-        <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: auto">
+        <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: 100%">
           <ul id="sheet-tabs" class="nav nav-tabs">
             <li id="new-sheet-tab" onMouseUp="activateNewWorksheet()"><a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
             <li id="template-sheet-tab" style="display: none"><a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a></li>
           </ul>
-          <div id="sheet-panes" class="tab-content" style="height: auto">
+          <div id="sheet-panes" class="tab-content" style="height: 93%">
             <div id="new-sheet-pane" class="tab-pane container">
             </div>
-            <div id="template-sheet-pane" class="tab-pane container" style="display: none">
+            <div id="template-sheet-pane" class="tab-pane container" style="height: inherit; display: none">
               {% include "/report/data_drop.html" %}
-              <div class="container" style="height: auto">
-                <div id="data-view"></div>
+              <div class="container" style="height: inherit">
+                <div id="data-view" style="height: 100%"></div>
               </div>              
             </div><!-- /#template-sheet-pane -->
           </div><!-- .tab-content -->
