@@ -21,7 +21,7 @@ for display.
     $( "<p></p>" ).html( tokenName ).appendTo( token );
     $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
       this.parentNode.remove();
-      drawDataTable();
+      updateView();
     }).appendTo( token );
     return token[0];
   }
@@ -32,7 +32,7 @@ for display.
       activeClass: "ui-state-default",
       drop: function( event, ui ) {
         $("#placeholder", this).before( newDeletableStringToken( ui.draggable.text() ));
-        drawDataTable();
+        updateView();
       }
     });
   }
