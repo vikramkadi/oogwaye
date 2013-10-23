@@ -5,16 +5,6 @@ body {
   padding-bottom: 0px;
 }
 
-.theme-dropdown .dropdown-menu {
-  display: block;
-  position: static;
-  margin-bottom: 20px;
-}
-
-.theme-showcase > p > .btn {
-  margin: 5px 0;
-}
-
 .bordered {
   border: 1px solid #ddd;
 }
