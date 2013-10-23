@@ -55,7 +55,9 @@
       var dataTable = getActiveDataTable();
       if ( thisSheet != undefined && dataTable != undefined ) {
         // Get column names then find their corresponding table indeces
-        var dimensions = getViewDimensions( thisSheet );
+        var dimensions = $( getDataDropDataTokens( thisSheet ) ).map( function() {
+          return this.id;         
+        });
         var colIndeces = getDataTableColumnIndeces( dimensions, dataTable );
         // Create dataView and display in view pane
         var dataView = new google.visualization.DataView( dataTable );
@@ -105,6 +107,12 @@
       // Initialize work area with blank worksheet
       newWorksheet();
 
+      $( "#graph-options" ).menu({
+        select: function( event, ui ) {
+          console.log(ui);
+        }
+      });
+
     });
     </script>
 {% endblock script %}
@@ -129,11 +137,30 @@
           <div id="sheet-panes" class="tab-content" style="height: 93%">
             <div id="new-sheet-pane" class="tab-pane container">
             </div>
-            <div id="template-sheet-pane" class="tab-pane container" style="height: inherit; display: none">
-              {% include "/report/data_drop.html" %}
+            <div id="template-sheet-pane" class="tab-pane container" style="height: inherit; padding-top: 15px; display: none">
+              <div class="row container" style="height: auto">
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-8">
+                  {% include "/report/data_drop.html" %}
+                </div>
+                <div class="col-md-3" style="vertical-align: baseline">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                      Graph as <span class="caret"></span>
+                    </button>
+                    <ul id="graph-options" class="dropdown-menu" role="menu">
+                      <li><a href="#">Table</a></li>
+                      <li><a href="#">Line Chart</a></li>
+                      <li><a href="#">Bar Chart</a></li>
+                      <li><a href="#">Pie Chart</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
               <div class="container" style="height: inherit">
                 <div id="data-view" style="height: 100%"></div>
-              </div>              
+              </div>            
             </div><!-- /#template-sheet-pane -->
           </div><!-- .tab-content -->
         </div><!-- /#workbook -->

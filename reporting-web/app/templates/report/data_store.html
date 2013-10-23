@@ -93,13 +93,29 @@ Dimensions and Measures, as candidates for display.
 </script>
     
 <div id="data-store" style="height: inherit">
-  <nav class="navbar" role="navigation" style="margin-bottom: 7px">
-  </nav>
+  <div class="navbar" role="navigation" style="margin-bottom: 7px">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Data Bin</a>
+    </div>
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
   <div id="data-pane" style="height: 93%; margin-bottom:7px">
     <div class="ui-layout-north">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <span class="panel-title">Dimensions</span>
+          <span class="panel-title"><medium>Dimensions</medium></span>
         </div>
         <ul id="dimensions-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
           <!-- create new list group items here -->
@@ -109,7 +125,7 @@ Dimensions and Measures, as candidates for display.
     <div class="ui-layout-center">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <span class="panel-title">Measures</span>
+          <span class="panel-title"><medium>Measures</medium></span>
         </div>
         <ul id="measures-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
           <!-- create new list group items here -->
