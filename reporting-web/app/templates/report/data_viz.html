@@ -21,4 +21,61 @@
         chart.draw( dataView, options );
     }
 
+    function drawPieChart( dom, dataView ) {
+        var options = {
+          title: 'Company Performance'
+        };
+        var chart = new google.visualization.PieChart( dom );
+        chart.draw( dataView, options );
+    }
+
+    function drawAreaChart( dom, dataView ) {
+        var options = {
+          title: 'Company Performance'
+        };
+        var chart = new google.visualization.AreaChart( dom );
+        chart.draw( dataView, options );
+    }
+
+    function drawBarChart( dom, dataView ) {
+        var options = {
+          title: 'Company Performance'
+        };
+        var chart = new google.visualization.BarChart( dom );
+        chart.draw( dataView, options );
+    }
+
+    function drawScatterChart( dom, dataView ) {
+        var options = {
+          title: 'Company Performance'
+        };
+        var chart = new google.visualization.ScatterChart( dom );
+        chart.draw( dataView, options );
+    }
+
+    function drawUsingViewerType( viewerType, dom, dataView ) {
+        console.log("update view");
+        switch ( viewerType.toUpperCase().replace( " ", "_" ) ) {
+            case "TABLE":
+                drawTable( dom, dataView );
+                break;
+            case "AREA_CHART":
+                drawAreaChart( dom, dataView );
+                break;
+            case "BAR_CHART":
+                drawBarChart( dom, dataView );
+                break;
+            case "LINE_CHART":
+                drawLineChart( dom, dataView );
+                break;
+            case "PIE_CHART":
+                drawPieChart( dom, dataView );
+                break;
+            case "SCATTER_PLOT":
+                drawScatterChart( dom, dataView );
+                break;
+            default:
+                break;
+        }
+    }
 </script>

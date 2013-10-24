@@ -22,6 +22,14 @@
         display: "" 
       }).prop( "id", sheetId ).addClass( "active" );
       initDataDrop( sheetPane );
+      // Setup default viewer type and menu callback
+      sheetPane.prop( "viewer-type", "table" );
+      $( "#viewer-menu", sheetPane ).menu({
+        select: function(event, ui) {
+          sheetPane.prop( "viewer-type", ui.item.text() );
+          updateView();
+        }
+      });
       // Create new tab by copying the template
       var sheetTab = $( "#template-sheet-tab" ).clone().css({
         display: ""
@@ -49,6 +57,11 @@
       return sheet[0];
     }
 
+    function getActiveViewerType() {
+      var sheet = getActiveWorksheet();
+      return $( sheet ).prop( "viewer-type" );
+    }
+
     // Main entry point for updating data display
     function updateView() {
       var thisSheet = getActiveWorksheet();
@@ -62,10 +75,10 @@
         // Create dataView and display in view pane
         var dataView = new google.visualization.DataView( dataTable );
         dataView.setColumns( colIndeces );
-
         var thisView = $( "#data-view", thisSheet )[0];
         //drawTable( thisView, dataTable, colIndeces, [] );
-        drawLineChart( thisView, dataView );
+        //drawLineChart( thisView, dataView );
+        drawUsingViewerType( getActiveViewerType(), thisView, dataView );
       }
     }
 
@@ -107,12 +120,6 @@
       // Initialize work area with blank worksheet
       newWorksheet();
 
-      $( "#graph-options" ).menu({
-        select: function( event, ui ) {
-          console.log(ui);
-        }
-      });
-
     });
     </script>
 {% endblock script %}
@@ -147,13 +154,15 @@
                 <div class="col-md-3" style="vertical-align: baseline">
                   <div class="btn-group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                      Graph as <span class="caret"></span>
+                      Viewer <span class="caret"></span>
                     </button>
-                    <ul id="graph-options" class="dropdown-menu" role="menu">
+                    <ul id="viewer-menu" class="dropdown-menu" role="menu">
                       <li><a href="#">Table</a></li>
-                      <li><a href="#">Line Chart</a></li>
+                      <li><a href="#">Area Chart</a></li>
                       <li><a href="#">Bar Chart</a></li>
+                      <li><a href="#">Line Chart</a></li> 
                       <li><a href="#">Pie Chart</a></li>
+                      <li><a href="#">Scatter Plot</a></li>
                     </ul>
                   </div>
                 </div>
