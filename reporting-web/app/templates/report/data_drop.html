@@ -16,25 +16,30 @@ for display.
 
 <script>
 
-  function newDataToken( tokenName ) {
-    var token = $( "<li></li>" ).addClass( "token-input-token" ).attr( "id", tokenName);
-    $( "<p></p>" ).html( tokenName ).appendTo( token );
+  function newDataToken( domObject ) {
+    var token = $( "<li></li>" ).addClass( "token-input-token" )
+      .prop( "id", domObject.data( "data-name" ) )
+      .prop( "data-type", domObject.data( "data-type" ) )
+      .prop( "column-id", domObject.data( "column-id" ) );
+    $( "<p></p>" ).html( domObject.text() ).appendTo( token );
     $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
       this.parentNode.remove();
       updateView();
     }).appendTo( token );
-    return token[0];
+    // Set object properties
+    return token;
   }
 
-  function initDataDrop( domContext ) {
-    // Define callback for droppable inputs
-    $( ".droppable-input", domContext ).droppable({
+  function newDataDrop() {
+    var dataDrop = $( "#template-data-drop" ).contents().clone();
+    $( ".droppable-input", dataDrop ).droppable({
       activeClass: "ui-state-default",
       drop: function( event, ui ) {
-        $("#placeholder", this).before( newDataToken( ui.draggable.text() ));
+        $("#placeholder", this).before( newDataToken( ui.draggable ));
         updateView();
       }
     });
+    return dataDrop;
   }
 
   // Return array of tokens stored for given view
@@ -47,8 +52,9 @@ for display.
 
 </script>
 
-<div id="data-drop" class="container">
-  <div class="container">
+<!-- templated html block -->
+<div id="template-data-drop" style="display: none">
+  <div id="data-drop" class="container">
     <div class="input-group input-group-md" style="margin-bottom: 15px">
     <span class="input-group-addon"><em>X</em></span>
     <ul class="form-control input-md droppable-input token-input-list">
@@ -65,7 +71,7 @@ for display.
       </li>
     </ul>
     </div>
-  </div>
+  </div><!-- .container -->
   <!--
   <form class="form-horizontal" role="form">
     <div class="form-group">
@@ -90,4 +96,4 @@ for display.
     </div>
   </form>
   -->
-</div><!-- /#data-drop -->
+</div>

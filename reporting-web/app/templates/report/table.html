@@ -1,178 +1,178 @@
 {% extends "/common/main.html" %}
 
 {% block style %}
-    {{ super() }}
+  {{ super() }}
 {% endblock style %}
 
 {% block script %}
-    {{ super() }}
-    <script type="text/javascript" src="//www.google.com/jsapi"></script>
-    <script type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='js/report/gdata_table.js')}}"></script>
+  {{ super() }}
+  <script type="text/javascript" src="//www.google.com/jsapi"></script>
+  <script type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='js/report/gdata_table.js')}}"></script>
 
-    <script>
-    //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
+  <script>
+  //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
 
-    function newWorksheet() {
-      var nsheets = $( "#workbook .tab-pane" ).length - 1;
-      var sheetId = "worksheet-".concat(nsheets.toString());
-      var sheetLabel = "Worksheet ".concat(nsheets.toString());
-      // Create new plane by copying the template
-      var sheetPane = $( "#template-sheet-pane" ).clone().css({
-        display: "" 
-      }).prop( "id", sheetId ).addClass( "active" );
-      initDataDrop( sheetPane );
-      // Setup default viewer type and menu callback
-      sheetPane.prop( "viewer-type", "table" );
-      $( "#viewer-menu", sheetPane ).menu({
-        select: function(event, ui) {
-          sheetPane.prop( "viewer-type", ui.item.text() );
-          updateView();
-        }
-      });
-      // Create new tab by copying the template
-      var sheetTab = $( "#template-sheet-tab" ).clone().css({
-        display: ""
-      }).prop( "id", sheetId.concat("-tab") ).addClass( "active" );
-      $( "a", sheetTab ).prop( "href", "#".concat( sheetPane.prop( "id" ))).html( sheetLabel );
-      // Insert into document
-      $( "#new-sheet-pane" ).before( sheetPane );
-      $( "#new-sheet-tab"  ).before( sheetTab  );
-      return sheetTab;
-    }
-
-    function activateNewWorksheet() {
-      var sheetTab = newWorksheet();
-      //$( "#new-sheet-tab" ).removeClass( "active" );
-      $( sheetTab ).addClass( "active" );
-    }
-
-    function getActiveDataTable() {
-       var dataTable  = $( "#workbook" ).prop( "dataTable" );
-       return dataTable;
-    }
-
-    function getActiveWorksheet() {
-      var sheet = $( "#sheet-panes > .tab-pane.active" );
-      return sheet[0];
-    }
-
-    function getActiveViewerType() {
-      var sheet = getActiveWorksheet();
-      return $( sheet ).prop( "viewer-type" );
-    }
-
-    // Main entry point for updating data display
-    function updateView() {
-      var thisSheet = getActiveWorksheet();
-      var dataTable = getActiveDataTable();
-      if ( thisSheet != undefined && dataTable != undefined ) {
-        // Get column names then find their corresponding table indeces
-        var dimensions = $( getDataDropDataTokens( thisSheet ) ).map( function() {
-          return this.id;         
-        });
-        var colIndeces = getDataTableColumnIndeces( dimensions, dataTable );
-        // Create dataView and display in view pane
-        var dataView = new google.visualization.DataView( dataTable );
-        dataView.setColumns( colIndeces );
-        var thisView = $( "#data-view", thisSheet )[0];
-        //drawTable( thisView, dataTable, colIndeces, [] );
-        //drawLineChart( thisView, dataView );
-        drawUsingViewerType( getActiveViewerType(), thisView, dataView );
+  function newWorksheet() {
+    var nsheets = $( "#workbook .tab-pane" ).length - 1;
+    var sheetId = "worksheet-".concat(nsheets.toString());
+    var sheetLabel = "Worksheet ".concat(nsheets.toString());
+    // Create new pane by copying the template
+    var sheetPane = $( "#template-sheet-pane" ).clone().css({
+      display: "" 
+    }).prop( "id", sheetId ).addClass( "active" );
+    // Append data-drop widget into pane
+    $( "#placeholder-data-drop", sheetPane).append( newDataDrop() );
+    // Setup default viewer type and menu callback
+    sheetPane.data( "viewing-style", "table" );
+    $( "#viewer-menu", sheetPane ).menu({
+      select: function(event, ui) {
+        sheetPane.data( "viewing-style", ui.item.text() );
+        updateView();
       }
-    }
-
-    $(document).ready( function() {
-
-      /*
-      $.ajax({
-        url:"/report/create/step2/pulldata", 
-        type: "POST",
-        data: {
-          datasource: "{{ datasource }}",
-          sql: "{{ sql }}" 
-        },
-        success: function( result ){
-          $( "#dimensions-list"   ).append( $.map(result.facts, newDataListItem) );
-          $( "#measures-list" ).append( $.map(result.dimensions, newDataListItem) );
-          $( "#workbook" ).prop( "dataTable", newDataTable(result) );
-        }
-      });
-      */
-
-      // Get column headers from fusion table and populate data-fields pane
-      // var tableId = "1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0";
-      var tableId = "1n8licSOEIjVhmpfeg698VJUt1q9iyizM-yN5Szc";
-      var apiKey  = "AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM";
-
-      $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
-        $( "#workbook" ).prop( "dataTable", newDataTable( json ) );
-        var dimensions = $( "#dimensions-list" ).append( $.map(json.columns, newDimensionsListItem) );
-        var measures   = $( "#measures-list" ).append( $.map(json.columns, newMeasuresListItem) );
-        initDataStore();
-      });
-
-      // Get fusion table data to populate dataTable object
-      $.get( fusionTableData( tableId, apiKey ), function( json ) {
-        loadDataTable( getActiveDataTable(), json );
-      });
-	
-      // Initialize work area with blank worksheet
-      newWorksheet();
-
     });
-    </script>
+    // Create new tab by copying the template
+    var sheetTab = $( "#template-sheet-tab" ).clone().css({
+      display: ""
+    }).prop( "id", sheetId.concat("-tab") ).addClass( "active" );
+    $( "a", sheetTab ).prop( "href", "#".concat( sheetPane.prop( "id" ))).html( sheetLabel );
+    // Insert into document
+    $( "#new-sheet-pane" ).before( sheetPane );
+    $( "#new-sheet-tab"  ).before( sheetTab  );
+    return sheetTab;
+  }
+
+  function activateNewWorksheet() {
+    var sheetTab = newWorksheet();
+    //$( "#new-sheet-tab" ).removeClass( "active" );
+    $( sheetTab ).addClass( "active" );
+  }
+
+  function getActiveDataTable() {
+     var dataTable  = $( "#workbook" ).data( "dataTable" );
+     return dataTable;
+  }
+
+  function getActiveWorksheet() {
+    var sheet = $( "#sheet-panes > .tab-pane.active" );
+    return sheet;
+  }
+
+  function getActiveViewerType() {
+    var sheet = getActiveWorksheet();
+    return $( sheet ).data( "viewing-style" );
+  }
+
+  // Main entry point for updating data display
+  function updateView() {
+    var thisSheet = getActiveWorksheet();
+    var dataTable = getActiveDataTable();
+    if ( thisSheet != undefined && dataTable != undefined ) {
+      // Get column names then find their corresponding table indeces
+      var columnIds = $( getDataDropDataTokens( thisSheet ) ).map( function() {
+        //return this.getAttribute("column-id");
+        return $( this ).prop( "column-id" );         
+      }).get();
+      // Create dataView and display in view pane
+      var dataView = new google.visualization.DataView( dataTable );
+      dataView.setColumns( columnIds );
+      var thisView = $( "#data-view", thisSheet );
+      // Finally, draw the dataView
+      drawUsingViewingStyle( getActiveViewerType(), thisView[0], dataView );
+    }
+  }
+
+  $(document).ready( function() {
+
+    /*
+    $.ajax({
+      url:"/report/create/step2/pulldata", 
+      type: "POST",
+      data: {
+        datasource: "{{ datasource }}",
+        sql: "{{ sql }}" 
+      },
+      success: function( result ){
+        $( "#dimensions-list"   ).append( $.map(result.facts, newDataListItem) );
+        $( "#measures-list" ).append( $.map(result.dimensions, newDataListItem) );
+        $( "#workbook" ).data( "dataTable", newDataTable(result) );
+      }
+    });
+    */
+
+    // Get column headers from fusion table and populate data-fields pane
+    // var tableId = "1r3cTnnutaRKVep7tVwqmWjRLk1Ffl_s4uooaBc0";
+    var tableId = "1n8licSOEIjVhmpfeg698VJUt1q9iyizM-yN5Szc";
+    var apiKey  = "AIzaSyCJw77UIjzePhi5tPw_t_EKJzgtLFMHVqM";
+
+    $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
+      $( "#workbook" ).data( "dataTable", newDataTable( json ) );
+      $( "#sidebar" ).append( newDataBin( json ) );
+    });
+
+    // Get fusion table data to populate dataTable object
+    $.get( fusionTableData( tableId, apiKey ), function( json ) {
+      loadDataTable( getActiveDataTable(), json );
+    });
+
+    // Initialize work area with blank worksheet
+    newWorksheet();
+
+  });
+  </script>
 {% endblock script %}
 
 {% block header %}
-    {% include "/report/header.html" %}
+  {% include "/report/header.html" %}
 {% endblock header %}
 
 {% block content %}
+  {% include "/report/data_bin.html"  %}
+  {% include "/report/data_drop.html" %}
+  {% include "/report/data_viz.html"  %}
 
-    {% include "/report/data_viz.html" %}
-    <div id="studio" class="bordered container theme-showcase">
-      <div class="row" style="height: 100%">
-        <div id="sidebar" class="col-md-2 col-xs-3" style="height: 100%">
-          {% include "/report/data_store.html" %}
-        </div>
-        <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: 100%">
-          <ul id="sheet-tabs" class="nav nav-tabs">
-            <li id="new-sheet-tab" onMouseUp="activateNewWorksheet()"><a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
-            <li id="template-sheet-tab" style="display: none"><a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a></li>
-          </ul>
-          <div id="sheet-panes" class="tab-content" style="height: 93%">
-            <div id="new-sheet-pane" class="tab-pane container">
-            </div>
-            <div id="template-sheet-pane" class="tab-pane container" style="height: inherit; padding-top: 15px; display: none">
-              <div class="row container" style="height: auto">
-                <div class="col-md-1">
-                </div>
-                <div class="col-md-8">
-                  {% include "/report/data_drop.html" %}
-                </div>
-                <div class="col-md-3" style="vertical-align: baseline">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                      Viewer <span class="caret"></span>
-                    </button>
-                    <ul id="viewer-menu" class="dropdown-menu" role="menu">
-                      <li><a href="#">Table</a></li>
-                      <li><a href="#">Area Chart</a></li>
-                      <li><a href="#">Bar Chart</a></li>
-                      <li><a href="#">Line Chart</a></li> 
-                      <li><a href="#">Pie Chart</a></li>
-                      <li><a href="#">Scatter Plot</a></li>
-                    </ul>
-                  </div>
+  <div id="studio" class="bordered container theme-showcase">
+    <div class="row" style="height: 100%">
+      <div id="sidebar" class="col-md-2 col-xs-3" style="height: 100%">
+        <!-- create sidebar ui here -->
+      </div>
+      <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: 100%">
+        <ul id="sheet-tabs" class="nav nav-tabs">
+          <li id="new-sheet-tab" onMouseUp="activateNewWorksheet()"><a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
+          <li id="template-sheet-tab" style="display: none"><a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a></li>
+        </ul>
+        <div id="sheet-panes" class="tab-content" style="height: 93%">
+          <div id="new-sheet-pane" class="tab-pane container">
+          </div>
+          <div id="template-sheet-pane" class="tab-pane container" style="height: inherit; padding-top: 15px; display: none">
+            <div class="row container" style="height: auto">
+              <div class="col-md-1">
+              </div>
+              <div id="placeholder-data-drop" class="col-md-8">
+                <!-- create data drop widget here -->
+              </div>
+              <div class="col-md-3" style="vertical-align: baseline">
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Viewer <span class="caret"></span>
+                  </button>
+                  <ul id="viewer-menu" class="dropdown-menu" role="menu">
+                    <li><a href="#">Table</a></li>
+                    <li><a href="#">Area Chart</a></li>
+                    <li><a href="#">Bar Chart</a></li>
+                    <li><a href="#">Line Chart</a></li> 
+                    <li><a href="#">Pie Chart</a></li>
+                    <li><a href="#">Scatter Plot</a></li>
+                  </ul>
                 </div>
               </div>
-              <div class="container" style="height: inherit">
-                <div id="data-view" style="height: 100%"></div>
-              </div>            
-            </div><!-- /#template-sheet-pane -->
-          </div><!-- .tab-content -->
-        </div><!-- /#workbook -->
-      </div><!-- /.row -->
-    </div> <!-- /#studio -->
+            </div>
+            <div class="container" style="height: inherit">
+              <div id="data-view" style="height: 100%"></div>
+            </div>            
+          </div><!-- /#template-sheet-pane -->
+        </div><!-- .tab-content -->
+      </div><!-- /#workbook -->
+    </div><!-- /.row -->
+  </div> <!-- /#studio -->
 {% endblock %}

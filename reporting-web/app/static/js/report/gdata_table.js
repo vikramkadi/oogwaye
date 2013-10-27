@@ -97,7 +97,7 @@
     }
 
     // Given array of column names, find corresponding indeces into dataTable
-    function getDataTableColumnIndeces( colNames, dataTable) {
+    function getDataTableColumnIndeces( colNames, dataTable ) {
       var colIndeces = $( colNames ).map( function() {
         for ( var i = 0; i < dataTable.H.length; i++ ) {
           if ( this == dataTable.H[i].label ) return i;

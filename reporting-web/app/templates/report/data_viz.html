@@ -53,9 +53,8 @@
         chart.draw( dataView, options );
     }
 
-    function drawUsingViewerType( viewerType, dom, dataView ) {
-        console.log("update view");
-        switch ( viewerType.toUpperCase().replace( " ", "_" ) ) {
+    function drawUsingViewingStyle( viewingStyle, dom, dataView ) {
+        switch ( viewingStyle.toUpperCase().replace( " ", "_" ) ) {
             case "TABLE":
                 drawTable( dom, dataView );
                 break;
