@@ -1,0 +1,142 @@
+<!--
+data_bin.html:
+Implements Data Bin container window.  The Data Bin organizes data into lists,
+Dimensions and Measures, as candidates for display.
+/-->
+<script>
+
+  function newDataListItem( dataObject ) {
+    var dataName = dataObject.name;
+    var dataType = dataObject.type.toLowerCase();
+    var listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName )
+      .data( "data-name", dataName )
+      .data( "data-type", dataType )
+      .data( "column-id", dataObject.columnId );
+    // Create identifying badge
+    var badge = $( "<span></span>" ).addClass( "badge" ).css({
+      "font-size":   "10px",
+      "font-weight": "normal"
+    });
+    switch ( dataType ) {
+      case "boolean":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
+        break;
+      case "date":
+      case "datetime":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-calendar" ).appendTo( badge );
+        break; 
+      case "location":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-road" ).appendTo( badge );
+        break;    
+      case "money":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-usd icon-white" ).appendTo( badge );
+        break;
+      case "number":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-signal" ).appendTo( badge );
+        break;
+      case "string":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-font" ).appendTo( badge );
+        break; 
+      case "timeofday":
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-time" ).appendTo( badge );
+        break;  
+      default:
+        $( "<i></i>" ).addClass( "glyphicon glyphicon-question-sign" ).appendTo( badge );
+        break;
+    }
+    badge.appendTo( listItem );
+    return listItem;
+  }
+
+  function newDimensionsListItem( dataObject ) {
+    if ( dataObject.type.toLowerCase() != "number" ) {
+      return newDataListItem( dataObject );;
+    }
+    return;
+  }
+
+  function newMeasuresListItem( dataObject ) {
+    if ( dataObject.type.toLowerCase() == "number" ) {
+      return newDataListItem( dataObject );
+    }
+    return;
+  }
+
+  function newDataBin( json ) {
+    var dataBin    = $( "#template-data-bin" ).contents().clone();
+    var dimensions = $( "#dimensions-list", dataBin ).append( $.map(json.columns, newDimensionsListItem) );
+    var measures   = $( "#measures-list",   dataBin ).append( $.map(json.columns, newMeasuresListItem) );
+
+    // Activate callback for sortable / draggable list items
+    $( ".sortable", dataBin ).sortable({
+      tolerance: "pointer",
+      connectWith: ".sortable",
+      placeholder: "list-group-item",
+      forcePlaceholderSize: true,
+      appendTo: "body",
+      helper: "clone",
+      cursor: "move",
+      opacity: .8,
+      zIndex: 666
+    }).disableSelection();
+
+    // Resize data pane
+    var dataPaneLayout = $( "#data-pane" ).layout({
+      applyDefaultStyles: true,
+      north__minSize: 100,
+      north__maxSize:   0,
+      center__minSize:100,
+      center__maxSize:  0
+    }).resizeAll();
+
+    return dataBin;
+  }
+
+</script>
+
+<!-- templated html block -->   
+<div id="template-data-bin" style="display: none"> 
+  <div id="data-bin" style="height: inherit">
+    <div class="navbar" role="navigation" style="margin-bottom: 7px">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Data Bin</a>
+      </div>
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="data-pane" style="height: 93%; margin-bottom:7px">
+      <div class="ui-layout-north">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <span class="panel-title"><medium>Dimensions</medium></span>
+          </div>
+          <ul id="dimensions-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
+            <!-- create new list group items here -->
+          </ul>
+        </div>
+      </div><!-- /.ui-layout-north -->
+      <div class="ui-layout-center">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <span class="panel-title"><medium>Measures</medium></span>
+          </div>
+          <ul id="measures-list" class="sortable list-group" style="line-height: 90%; font-size: 90%">
+            <!-- create new list group items here -->
+          </ul>
+        </div><!-- /.panel -->
+      </div><!-- /.ui-layout-center -->
+    </div><!-- /#data-pane -->
+  </div><!-- /#data-bin -->
+</div><!-- /#templatle -->
+
