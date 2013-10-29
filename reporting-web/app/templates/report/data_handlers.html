@@ -1,0 +1,93 @@
+<!--
+data_handlers.html:
+Implements data handlers, i.e.  for grouping, aggregating, and formatting the different types of data.
+/-->
+<script>
+  // Declare namespace
+  var ns = App.namespace("App.Studio.Data.Handlers");
+
+  ns.BasicHandler = function () {
+    this.data_name      = undefined;
+    this.data_type      = undefined;
+    this.group_enabled  = false;
+    this.group_func     = undefined;
+    this.agg_enabled    = false;
+    this.agg_func       = undefined;
+    this.format_enabled = false;
+    this.format_func    = undefined;
+  }
+
+  ns.BooleanHandler = function( name, column_id ) {
+    this.data_name = name;
+    this.column_id = column_id;
+  }
+
+  ns.DateHandler = function( name, column_id ) {
+    this.data_name = name;
+    this.column_id = column_id;
+  }
+
+  ns.LocationHandler = function( name, column_id ) {
+    this.data_name = name;
+    this.column_id = column_id;
+  }
+
+  ns.NumberHandler = function( name, column_id ) { 
+    this.data_name = name;
+    this.column_id = column_id;
+  }
+
+  ns.StringHandler = function( name, column_id ) {
+    this.data_name = name;
+    this.column_id = column_id;
+  }
+  ns.StringHandler.prototype = Object.create( ns.BasicHandler.prototype );
+  ns.StringHandler.prototype.data_type = "string";
+  ns.StringHandler.prototype.debug_func = function() {
+    console.log( this.data_name + " of type " + this.data_type + " " + this.column_id);
+    return;
+  }
+  ns.StringHandler.prototype.group_func = function() {
+    return "group";;
+  }
+  ns.StringHandler.prototype.agg_func = function() {
+    return "aggregate";
+  }
+
+  ns.TimeHandler = function( name, column_id ) {
+    this.data_name = name;
+    this.column_id = column_id;
+  }
+
+  ns.newDataHandler = function( dataItem ) {
+    var dataName = dataItem.data( "data-name" );
+    var dataType = dataItem.data( "data-type" );
+    var columnId = dataItem.data( "column-id" );
+    var dataHandler;
+    switch ( dataType ) {
+      case "boolean":
+        dataHandler = new this.StringHandler( dataName, columnId );
+        break;
+      case "date":
+      case "datetime":
+        dataHandler = new this.DateHandler( dataName, columnId );
+        break;
+      case "location":
+        dataHandler = new this.LocationHandler( dataName, columnId );
+        break;
+      case "number":
+        dataHandler = new this.NumberHandler( dataName, columnId );
+        break;
+      case "string":
+        dataHandler = new this.StringHandler( dataName, columnId );
+        break;
+      case "timeofday":
+        dataHandler = new this.TimeDataHandler( dataName, column_id );
+        break;
+      default:
+        dataHandler = new this.StringHandler( dataName, column_Id );
+        break;
+    }
+    return dataHandler;
+  }
+</script>
