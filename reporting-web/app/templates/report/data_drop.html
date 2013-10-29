@@ -15,18 +15,19 @@ for display.
 </style>
 
 <script>
+  var ns = App.namespace("App.Studio.Data.Drop");
+  var dataHandlers = App.namespace("App.Studio.Data.Handlers");
 
-  function newDataToken( domObject ) {
-    var token = $( "<li></li>" ).addClass( "token-input-token" )
-      .prop( "id", domObject.data( "data-name" ) )
-      .prop( "data-type", domObject.data( "data-type" ) )
-      .prop( "column-id", domObject.data( "column-id" ) );
-    $( "<p></p>" ).html( domObject.text() ).appendTo( token );
+  function newDataToken( dataItem ) {
+    var token = $( "<li></li>" ).addClass( "token-input-token" );
+    $( "<p></p>" ).html( dataItem.text() ).appendTo( token );
     $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
       this.parentNode.remove();
       updateView();
     }).appendTo( token );
     // Set object properties
+    token.prop( "id", dataItem.prop( "data-name" ) );
+    token.data( "data-handler", dataHandlers.newDataHandler( dataItem ) );
     return token;
   }
 
@@ -42,7 +43,7 @@ for display.
     return dataDrop;
   }
 
-  // Return array of tokens stored for given view
+  // Return array of Tokens stored for given view
   function getDataDropDataTokens( domContext ) {
     var tokens = $( "ul .token-input-token", domContext ).map( function() {
       return this;

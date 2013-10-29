@@ -71,7 +71,7 @@
       // Get column names then find their corresponding table indeces
       var columnIds = $( getDataDropDataTokens( thisSheet ) ).map( function() {
         //return this.getAttribute("column-id");
-        return $( this ).prop( "column-id" );         
+        return $( this ).data( "column-id" );         
       }).get();
       // Create dataView and display in view pane
       var dataView = new google.visualization.DataView( dataTable );
@@ -127,7 +127,9 @@
 {% endblock header %}
 
 {% block content %}
+  {{ super() }}
   {% include "/report/data_bin.html"  %}
+  {% include "/report/data_handlers.html" %}
   {% include "/report/data_drop.html" %}
   {% include "/report/data_viz.html"  %}
 

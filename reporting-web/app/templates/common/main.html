@@ -39,6 +39,26 @@
 
     {% block script %}
     <script type="text/javascript">
+        // Declare namespace for this module
+        var App = App || {};
+
+        // Helper function for defining local namespaces.
+        // (http://elegantcode.com/2011/01/26/basic-javascript-part-8-namespaces)
+        App.namespace = function( namespaceString ) {
+            var parts = namespaceString.split('.'),
+                parent = window,
+                currentPart = '';        
+            for (var i = 0, length = parts.length; i < length; i++) {
+                currentPart = parts[i];
+                parent[currentPart] = parent[currentPart] || {};
+                parent = parent[currentPart];
+            }
+            if (parent.ns == undefined) {
+                parent.ns = namespaceString;
+            }
+            return parent;
+        }
+
         $( document ).ready( function() {
             // Adjust height of workspace panels to cover full screen
 	       $( "#studio" ).each(function() {
