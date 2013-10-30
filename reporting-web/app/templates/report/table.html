@@ -69,10 +69,13 @@
     var dataTable = getActiveDataTable();
     if ( thisSheet != undefined && dataTable != undefined ) {
       // Get column names then find their corresponding table indeces
+      console.log( $( getDataDropDataTokens( thisSheet)));
       var columnIds = $( getDataDropDataTokens( thisSheet ) ).map( function() {
         //return this.getAttribute("column-id");
-        return $( this ).data( "column-id" );         
+        console.log( $(this).data("data-handler") );
+        return $( this ).data( "data-handler" ).column_id;         
       }).get();
+      console.log(columnIds);
       // Create dataView and display in view pane
       var dataView = new google.visualization.DataView( dataTable );
       dataView.setColumns( columnIds );
