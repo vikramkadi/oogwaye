@@ -4,7 +4,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
 /-->
 <script>
   // Declare namespace
-  var ns = App.namespace("App.Studio.Data.Handlers");
+  var ns = App.namespace("App.Studio.Data");
 
   ns.BasicHandler = function () {
     this.data_name      = undefined;
@@ -59,33 +59,33 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     this.column_id = column_id;
   }
 
-  ns.newDataHandler = function( dataItem ) {
+  ns.DataHandler = function( dataItem ) {
     var dataName = dataItem.data( "data-name" );
     var dataType = dataItem.data( "data-type" );
     var columnId = dataItem.data( "column-id" );
     var dataHandler;
     switch ( dataType ) {
       case "boolean":
-        dataHandler = new this.StringHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.StringHandler( dataName, columnId );
         break;
       case "date":
       case "datetime":
-        dataHandler = new this.DateHandler( dataName, columnId );
+        dataHandler = new App.Studio.Datas.DateHandler( dataName, columnId );
         break;
       case "location":
-        dataHandler = new this.LocationHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.LocationHandler( dataName, columnId );
         break;
       case "number":
-        dataHandler = new this.NumberHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.NumberHandler( dataName, columnId );
         break;
       case "string":
-        dataHandler = new this.StringHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.StringHandler( dataName, columnId );
         break;
       case "timeofday":
-        dataHandler = new this.TimeDataHandler( dataName, column_id );
+        dataHandler = new App.Studio.Data.TimeDataHandler( dataName, column_id );
         break;
       default:
-        dataHandler = new this.StringHandler( dataName, column_Id );
+        dataHandler = new App.Studio.Data.StringHandler( dataName, column_Id );
         break;
     }
     return dataHandler;

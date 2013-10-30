@@ -3,6 +3,8 @@ data_drop.html:
 Implements drop boxes for data fields. Data dropped in these boxes are readied
 for display.
 /-->
+{% include "/report/data_handlers.html" %}
+
 <link rel="stylesheet" href="{{url_for('static', filename='css/common/token-input.css')}}" type="text/css" />
 
 <style>
@@ -15,36 +17,35 @@ for display.
 </style>
 
 <script>
-  var ns = App.namespace("App.Studio.Data.Drop");
-  var dataHandlers = App.namespace("App.Studio.Data.Handlers");
+  var ns = App.namespace("App.Studio.Data");
 
-  function newDataToken( dataItem ) {
+  ns.DataToken = function( dataItem, uiCallback ) {
     var token = $( "<li></li>" ).addClass( "token-input-token" );
     $( "<p></p>" ).html( dataItem.text() ).appendTo( token );
     $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
       this.parentNode.remove();
-      updateView();
+      uiCallback( this );
     }).appendTo( token );
     // Set object properties
     token.prop( "id", dataItem.prop( "data-name" ) );
-    token.data( "data-handler", dataHandlers.newDataHandler( dataItem ) );
+    token.data( "data-handler", new App.Studio.Data.DataHandler( dataItem ) );
     return token;
   }
 
-  function newDataDrop() {
+  ns.DataDropWidget = function( uiCallback ) {
     var dataDrop = $( "#template-data-drop" ).contents().clone();
     $( ".droppable-input", dataDrop ).droppable({
       activeClass: "ui-state-default",
       drop: function( event, ui ) {
-        $("#placeholder", this).before( newDataToken( ui.draggable ));
-        updateView();
+        $( "#placeholder", this ).before( new App.Studio.Data.DataToken( ui.draggable, uiCallback ));
+        uiCallback( this );
       }
     });
     return dataDrop;
   }
 
   // Return array of Tokens stored for given view
-  function getDataDropDataTokens( domContext ) {
+  ns.getDataDropDataTokens = function( domContext ) {
     var tokens = $( "ul .token-input-token", domContext ).map( function() {
       return this;
     }).get();
