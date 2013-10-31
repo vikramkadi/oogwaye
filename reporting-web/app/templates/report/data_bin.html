@@ -4,8 +4,9 @@ Implements Data Bin container window.  The Data Bin organizes data into lists,
 Dimensions and Measures, as candidates for display.
 /-->
 <script>
+  var ns = App.namespace("App.Studio.Data");
 
-  function newDataListItem( dataObject ) {
+  ns.DataListItem = function( dataObject ) {
     var dataName = dataObject.name;
     var dataType = dataObject.type.toLowerCase();
     var listItem = $( "<li></li>" ).addClass( "list-group-item" ).html( dataName )
@@ -48,24 +49,24 @@ Dimensions and Measures, as candidates for display.
     return listItem;
   }
 
-  function newDimensionsListItem( dataObject ) {
+  ns.newDimension = function( dataObject ) {
     if ( dataObject.type.toLowerCase() != "number" ) {
-      return newDataListItem( dataObject );;
+      return new App.Studio.Data.DataListItem( dataObject );;
     }
     return;
   }
 
-  function newMeasuresListItem( dataObject ) {
+  ns.newMeasure = function( dataObject ) {
     if ( dataObject.type.toLowerCase() == "number" ) {
-      return newDataListItem( dataObject );
+      return new App.Studio.Data.DataListItem( dataObject );
     }
     return;
   }
 
-  function newDataBin( json ) {
+  ns.DataBin = function( json ) {
     var dataBin    = $( "#template-data-bin" ).contents().clone();
-    var dimensions = $( "#dimensions-list", dataBin ).append( $.map(json.columns, newDimensionsListItem) );
-    var measures   = $( "#measures-list",   dataBin ).append( $.map(json.columns, newMeasuresListItem) );
+    var dimensions = $( "#dimensions-list", dataBin ).append( $.map(json.columns, App.Studio.Data.newDimension) );
+    var measures   = $( "#measures-list",   dataBin ).append( $.map(json.columns, App.Studio.Data.newMeasure) );
 
     // Activate callback for sortable / draggable list items
     $( ".sortable", dataBin ).sortable({
