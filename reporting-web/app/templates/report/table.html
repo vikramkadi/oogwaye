@@ -107,7 +107,7 @@
 
     $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
       $( "#workbook" ).data( "dataTable", newDataTable( json ) );
-      $( "#sidebar" ).append( newDataBin( json ) );
+      $( "#sidebar" ).append( new App.Studio.Data.DataBin( json ) );
     });
 
     // Get fusion table data to populate dataTable object
