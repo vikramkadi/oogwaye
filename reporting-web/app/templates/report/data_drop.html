@@ -27,7 +27,7 @@ for display.
       uiCallback( this );
     }).appendTo( token );
     // Set object properties
-    token.prop( "id", dataItem.prop( "data-name" ) );
+    token.prop( "id", dataItem.data( "data-name" ) );
     token.data( "data-handler", new App.Studio.Data.DataHandler( dataItem ) );
     return token;
   }
@@ -44,12 +44,37 @@ for display.
     return dataDrop;
   }
 
-  // Return array of Tokens stored for given view
-  ns.getDataDropDataTokens = function( domContext ) {
-    var tokens = $( "ul .token-input-token", domContext ).map( function() {
-      return this;
-    }).get();
-    return tokens;
+  // Return array of keys for grouping columns
+  ns.getXdataColumnKeys = function( domContext ) {
+    var columnKeys = $( "#x-tokens .token-input-token", domContext ).map( function() {
+      var data_handler = $( this ).data( "data-handler" );
+      if ( data_handler != undefined ) {
+        return data_handler.modify();
+      }
+    });
+    return columnKeys ? columnKeys.get() : [];
+  }
+
+  ns.getYdataColumnKeys = function( domContext ) {
+    var columnKeys = $( "#y-tokens .token-input-token", domContext ).map( function() {
+      var data_handler = $( this ).data( "data-handler" );
+      if ( data_handler != undefined ) {
+        return data_handler.combine();
+      }
+    });
+    return columnKeys ? columnKeys.get() : [];
+  }
+
+  ns.formatColumns = function( dataTable, domContext ) {
+    // TODO:  in pseudocode
+    for ( var index = 0; index < dataTable.getNumberOfColumns(); index++ ) {
+      var dataName  = dataTable.getColumnLabel( index );
+      var dataToken = $( "#" + dataName + ".token-input-token", domContext );
+      var data_handler = $( dataToken ).data( "data-handler" );
+      if ( data_handler != undefined ) {
+        data_handler.format( dataTable, index );
+      }
+    }
   }
 
 </script>
@@ -59,7 +84,7 @@ for display.
   <div id="data-drop" class="container">
     <div class="input-group input-group-md" style="margin-bottom: 15px">
     <span class="input-group-addon"><em>X</em></span>
-    <ul class="form-control input-md droppable-input token-input-list">
+    <ul id="x-tokens" class="form-control input-md droppable-input token-input-list">
       <li id="placeholder">
         <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
       </li>
@@ -67,7 +92,7 @@ for display.
     </div>
     <div class="input-group input-group-md" style="margin-bottom: 15px">
     <span class="input-group-addon"><em>Y</em></span>
-    <ul class="form-control input-md droppable-input token-input-list">
+    <ul id="y-tokens" class="form-control input-md droppable-input token-input-list">
       <li id="placeholder">
         <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
       </li>

@@ -27,7 +27,7 @@
     // Setup default viewer type and menu callback
     sheetPane.data( "viewing-style", "table" );
     $( "#viewer-menu", sheetPane ).menu({
-      select: function(event, ui) {
+      select: function( event, ui ) {
         sheetPane.data( "viewing-style", ui.item.text() );
         App.Studio.Report.updateView( this );
       }
@@ -69,16 +69,16 @@
     var thisSheet = App.Studio.Report.getActiveWorksheet();
     var dataTable = App.Studio.Report.getActiveDataTable();
     if ( thisSheet != undefined && dataTable != undefined ) {
-      // Get column names then find their corresponding table indeces
-      var columnIds = $( App.Studio.Data.getDataDropDataTokens( thisSheet ) ).map( function() {
-        return $( this ).data( "data-handler" ).column_id;         
-      }).get();
       // Create dataView and display in view pane
-      var dataView = new google.visualization.DataView( dataTable );
-      dataView.setColumns( columnIds );
+      // var dataView = new google.visualization.DataView( dataTable );
+      // dataView.setColumns( columnIds );
+      var xKeys = App.Studio.Data.getXdataColumnKeys( thisSheet );
+      var yKeys = App.Studio.Data.getYdataColumnKeys( thisSheet );
+      var dataView = google.visualization.data.group( dataTable, xKeys, yKeys );
+      App.Studio.Data.formatColumns( dataView, thisSheet );
       var thisView = $( "#data-view", thisSheet );
       // Finally, draw the dataView
-      drawUsingViewingStyle( App.Studio.Report.getActiveViewerType(), thisView[0], dataView );
+      App.Studio.Viz.drawWithViewingStyle( thisView[0], dataView, App.Studio.Report.getActiveViewerType() );
     }
   }
 

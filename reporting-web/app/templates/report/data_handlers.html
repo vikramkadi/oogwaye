@@ -2,29 +2,94 @@
 data_handlers.html:
 Implements data handlers, i.e.  for grouping, aggregating, and formatting the different types of data.
 /-->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+
 <script>
   // Declare namespace
   var ns = App.namespace("App.Studio.Data");
 
+  ns.ModifyKey = function( column_id, column_name, modifier, return_type ) {
+    this.id = column_name;
+    this.label = column_name;
+    this.column = column_id;
+    this.modifier = modifier;
+    this.type = return_type;
+  }
+
+  ns.ModifyFuncs = {
+    Day: function( date ) {
+      return date.clearTime();
+    },
+    Month: function( date ) {
+      return date.moveToFirstDayOfMonth();
+    },
+    Quarter: function( date ) {
+      return Math.floor( date.getMonth()/3 ) + 1;
+    }
+  }
+
+  ns.CombineKey = function( column_id, column_name, combiner, return_type ) {
+    this.id = column_name;
+    this.label = column_name;
+    this.column = column_id;
+    this.aggregation = combiner;
+    this.type = return_type;
+  }
+
   ns.BasicHandler = function () {
-    this.data_name      = undefined;
-    this.data_type      = undefined;
-    this.group_enabled  = false;
-    this.group_func     = undefined;
-    this.agg_enabled    = false;
-    this.agg_func       = undefined;
-    this.format_enabled = false;
-    this.format_func    = undefined;
+    this.data_name  = undefined;
+    this.data_type  = undefined;
+    this.do_modify  = false;
+    this.modify     = function() { return this.column_id; }
+    this.do_combine = false;
+    this.combine    = function() { return this.column_id; }
+    this.do_format  = false;
+    this.format     = function( dataTable ) { return; }
   }
 
   ns.BooleanHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+    this.data_name  = name;
+    this.column_id  = column_id;
   }
 
-  ns.DateHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+  // DateHandler
+  ns.DateHandler    = function( name, column_id ) {
+    this.data_name  = name;
+    this.column_id  = column_id;
+    this.do_modify  = true;  // TODO:  hard-coded for now
+    this.do_combine = false;
+    this.do_format  = true;
+  }
+  ns.DateHandler.prototype = Object.create( ns.BasicHandler.prototype );
+  ns.DateHandler.prototype.data_type = "date";
+  ns.DateHandler.prototype.modify = function() {
+    if ( this.do_modify ) {
+      //return this.column_id;
+      return new App.Studio.Data.ModifyKey( 
+        this.column_id, this.data_name, App.Studio.Data.ModifyFuncs.Day, 'date'
+      );
+    }
+    return;
+  }
+  ns.DateHandler.prototype.combine = function() {
+    if ( this.do_combine ) {
+      return new App.Studio.Data.CombineKey(
+        this.column_id, this.data_name, google.visualization.data.max, 'date'
+      );
+    }
+    return;
+  }
+  ns.DateHandler.prototype.format = function( dataTable, column_id ) {
+    if ( this.do_format ) {
+      var formatter = new google.visualization.DateFormat({
+        pattern:  "MMMM yyyy"
+      });
+      formatter.format( dataTable, column_id );
+    }
+  }
+  ns.DateHandler.prototype.info = function() {
+    console.log( this.data_name + " of type " + this.data_type + " and id " + this.column_id);
+    return;
   }
 
   ns.LocationHandler = function( name, column_id ) {
@@ -32,26 +97,83 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     this.column_id = column_id;
   }
 
-  ns.NumberHandler = function( name, column_id ) { 
-    this.data_name = name;
-    this.column_id = column_id;
+  // NumberHandler
+  ns.NumberHandler  = function( name, column_id ) { 
+    this.data_name  = name;
+    this.column_id  = column_id;
+    this.do_modify  = false;    // TODO
+    this.do_combine = true;
+    this.do_format  = true;
+  }
+  ns.NumberHandler.prototype = Object.create( ns.BasicHandler.prototype );
+  ns.NumberHandler.prototype.data_type = "number";
+  ns.NumberHandler.prototype.modify = function() {
+    if ( this.do_modify ) {
+      //return this.column_id;
+      return new App.Studio.Data.ModifyKey( 
+        this.column_id, this.data_name, App.Studio.Data.ModifyFuncs.Month, 'number'
+      );
+    }
+    return;
+  }
+  ns.NumberHandler.prototype.combine = function() {
+    if ( this.do_combine ) {
+      return new App.Studio.Data.CombineKey(
+        this.column_id, this.data_name, google.visualization.data.sum, 'number'
+      );
+    }
+    return;
+  }
+  ns.NumberHandler.prototype.format = function( dataTable, column_id ) {
+    // TODO decimal places, USD, %, etc.
+    if ( this.do_format ) {
+      var formatter = new google.visualization.NumberFormat({
+        prefix: '$', 
+        negativeColor: 'red', 
+        negativeParens: true
+      });
+      console.log( formatter );
+      console.log(column_id);
+      formatter.format( dataTable, column_id );
+    }
+  }
+  ns.NumberHandler.prototype.info = function() {
+    console.log( this.data_name + " of type " + this.data_type + " and id " + this.column_id);
+    return;
   }
 
-  ns.StringHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+  // StringHandler
+  ns.StringHandler  = function( name, column_id ) {
+    this.data_name  = name;
+    this.column_id  = column_id;
+    this.do_modify  = false;
+    this.do_combine = false;
+    this.do_format  = false;
   }
   ns.StringHandler.prototype = Object.create( ns.BasicHandler.prototype );
   ns.StringHandler.prototype.data_type = "string";
-  ns.StringHandler.prototype.debug_func = function() {
-    console.log( this.data_name + " of type " + this.data_type + " " + this.column_id);
+  ns.StringHandler.prototype.modify = function() {
+    if ( this.do_modify ) {
+      //return this.column_id;
+      return this.column_id;
+    }
+    return this.column_id;
+  }
+  ns.StringHandler.prototype.combine = function() {
+    if ( this.do_combine ) {
+      return new App.Studio.Data.CombineKey(
+        this.column_id, this.data_name, google.visualization.data.sum, 'string'
+      );
+    }
     return;
   }
-  ns.StringHandler.prototype.group_func = function() {
-    return "group";;
+  ns.StringHandler.prototype.format = function( dataTable ) {
+    // Do nothing
+    // TODO:  Upper case, lower case, etc.
   }
-  ns.StringHandler.prototype.agg_func = function() {
-    return "aggregate";
+  ns.StringHandler.prototype.info = function() {
+    console.log( this.data_name + " of type " + this.data_type + " " + this.column_id);
+    return;
   }
 
   ns.TimeHandler = function( name, column_id ) {
@@ -70,7 +192,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
         break;
       case "date":
       case "datetime":
-        dataHandler = new App.Studio.Datas.DateHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.DateHandler( dataName, columnId );
         break;
       case "location":
         dataHandler = new App.Studio.Data.LocationHandler( dataName, columnId );

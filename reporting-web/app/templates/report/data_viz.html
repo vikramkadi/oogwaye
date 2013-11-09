@@ -5,14 +5,16 @@
     google.load("visualization", "1", {packages:["table"]});
     google.load("visualization", "1", {packages:["corechart"]});
 
+    var ns = App.namespace("App.Studio.Viz");
+
     // Display data in table
-    function drawTable( dom, dataView ) {
+    ns.drawTable = function( dom, dataView ) {
         // Create dataView and display in view pane
         var table = new google.visualization.Table( dom );
         table.draw( dataView, {  width: toString(dom.clientWidth), height: toString(dom.clientWidth) } );
     }
 
-    function drawLineChart( dom, dataView ) {
+    ns.drawLineChart = function( dom, dataView ) {
         var options = {
           title: 'Company Performance'
         };
@@ -20,7 +22,7 @@
         chart.draw( dataView, options );
     }
 
-    function drawPieChart( dom, dataView ) {
+    ns.drawPieChart = function( dom, dataView ) {
         var options = {
           title: 'Company Performance'
         };
@@ -28,7 +30,7 @@
         chart.draw( dataView, options );
     }
 
-    function drawAreaChart( dom, dataView ) {
+    ns.drawAreaChart = function( dom, dataView ) {
         var options = {
           title: 'Company Performance'
         };
@@ -36,7 +38,7 @@
         chart.draw( dataView, options );
     }
 
-    function drawBarChart( dom, dataView ) {
+    ns.drawBarChart = function( dom, dataView ) {
         var options = {
           title: 'Company Performance'
         };
@@ -44,7 +46,7 @@
         chart.draw( dataView, options );
     }
 
-    function drawScatterChart( dom, dataView ) {
+    ns.drawScatterChart = function( dom, dataView ) {
         var options = {
           title: 'Company Performance'
         };
@@ -52,25 +54,25 @@
         chart.draw( dataView, options );
     }
 
-    function drawUsingViewingStyle( viewingStyle, dom, dataView ) {
+    ns.drawWithViewingStyle = function( dom, dataView, viewingStyle ) {
         switch ( viewingStyle.toUpperCase().replace( " ", "_" ) ) {
             case "TABLE":
-                drawTable( dom, dataView );
+                App.Studio.Viz.drawTable( dom, dataView );
                 break;
             case "AREA_CHART":
-                drawAreaChart( dom, dataView );
+                App.Studio.Viz.drawAreaChart( dom, dataView );
                 break;
             case "BAR_CHART":
-                drawBarChart( dom, dataView );
+                App.Studio.Viz.drawBarChart( dom, dataView );
                 break;
             case "LINE_CHART":
-                drawLineChart( dom, dataView );
+                App.Studio.Viz.drawLineChart( dom, dataView );
                 break;
             case "PIE_CHART":
-                drawPieChart( dom, dataView );
+                App.Studio.Viz.drawPieChart( dom, dataView );
                 break;
             case "SCATTER_PLOT":
-                drawScatterChart( dom, dataView );
+                App.Studio.Viz.drawScatterChart( dom, dataView );
                 break;
             default:
                 break;
