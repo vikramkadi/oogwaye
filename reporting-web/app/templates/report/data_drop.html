@@ -47,9 +47,9 @@ for display.
   // Return array of keys for grouping columns
   ns.getXdataColumnKeys = function( domContext ) {
     var columnKeys = $( "#x-tokens .token-input-token", domContext ).map( function() {
-      var data_handler = $( this ).data( "data-handler" );
-      if ( data_handler != undefined ) {
-        return data_handler.modify();
+      var dataHandler = $( this ).data( "data-handler" );
+      if ( dataHandler != undefined ) {
+        return dataHandler.getModifier();
       }
     });
     return columnKeys ? columnKeys.get() : [];
@@ -57,22 +57,24 @@ for display.
 
   ns.getYdataColumnKeys = function( domContext ) {
     var columnKeys = $( "#y-tokens .token-input-token", domContext ).map( function() {
-      var data_handler = $( this ).data( "data-handler" );
-      if ( data_handler != undefined ) {
-        return data_handler.combine();
+      var dataHandler = $( this ).data( "data-handler" );
+      if ( dataHandler != undefined ) {
+        return dataHandler.getCombiner();
       }
     });
     return columnKeys ? columnKeys.get() : [];
   }
 
   ns.formatColumns = function( dataTable, domContext ) {
-    // TODO:  in pseudocode
     for ( var index = 0; index < dataTable.getNumberOfColumns(); index++ ) {
       var dataName  = dataTable.getColumnLabel( index );
       var dataToken = $( "#" + dataName + ".token-input-token", domContext );
-      var data_handler = $( dataToken ).data( "data-handler" );
-      if ( data_handler != undefined ) {
-        data_handler.format( dataTable, index );
+      var dataHandler = $( dataToken ).data( "data-handler" );
+      if ( dataHandler != undefined ) {
+        var formatter = dataHandler.getFormatter();
+        if ( formatter ) {
+          formatter.format( dataTable, index );
+        }
       }
     }
   }
