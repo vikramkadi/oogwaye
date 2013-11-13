@@ -8,6 +8,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
   // Declare namespace
   var ns = App.namespace("App.Studio.Data");
 
+  // Modifier class
   ns.Modifier = function( columnId, columnName, modifier, returnType ) {
     this.id = columnName;
     this.label = columnName;
@@ -16,6 +17,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     this.type = returnType;
   }
 
+  // Data Modifying Operations
   ns.ModifyOps = {
     DAY: {  
       func: function( date ) {
@@ -37,6 +39,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     },
   }
 
+  // Combiner class
   ns.Combiner = function( columnId, columnName, combiner, returnType ) {
     this.id = columnName;
     this.label = columnName;
@@ -45,6 +48,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     this.type = returnType;
   }
 
+  // Data Combining Operations
   ns.CombineOps = {
     AVG: {
       func: function( values ) {
@@ -60,6 +64,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     }
   }
 
+  // Formatting Operations
   ns.FormatOps = {
     DATE: {
       func: function( opts ) {
@@ -79,6 +84,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     }
   }
 
+  // BasicHandler:  base class
   ns.BasicHandler = function () {
     this.dataName    = undefined;
     this.dataType    = undefined;
@@ -123,10 +129,13 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     return;
   }
 
+  // BooleanHandler
   ns.BooleanHandler = function( name, columnId ) {
     this.dataName  = name;
     this.columnId  = columnId;
   }
+  ns.BooleanHandler.prototype = Object.create( ns.BasicHandler.prototype );
+  ns.BooleanHandler.prototype.dataType = "boolean";
 
   // DateHandler
   ns.DateHandler  = function( name, columnId ) {
@@ -144,6 +153,8 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     this.dataName = name;
     this.columnId = columnId;
   }
+  ns.LocationHandler.prototype = Object.create( ns.BasicHandler.prototype );
+  ns.LocationHandler.prototype.dataType = "string";
 
   // NumberHandler
   ns.NumberHandler  = function( name, columnId ) { 
@@ -166,10 +177,13 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
   ns.StringHandler.prototype = Object.create( ns.BasicHandler.prototype );
   ns.StringHandler.prototype.dataType = "string";
   
+  // TimeHandler
   ns.TimeHandler = function( name, columnId ) {
     this.dataName = name;
     this.columnId = columnId;
   }
+  ns.TimeHandler.prototype = Object.create( ns.BasicHandler.prototype );
+  ns.TimeHandler.prototype.dataType = "timeofday";
 
   ns.DataHandler = function( dataItem ) {
     var dataName = dataItem.data( "data-name" );
