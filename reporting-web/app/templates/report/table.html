@@ -7,7 +7,7 @@
 {% block script %}
   {{ super() }}
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
-  <script type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></script>
+  <script type="text/javascript" src="{{url_for('static',filename='libs/jquery-layout/jquery.layout-latest.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='js/report/gdata_table.js')}}"></script>
 
   <script>
@@ -118,6 +118,9 @@
     // Initialize work area with blank worksheet
     new App.Studio.Report.Worksheet();
 
+    $("#test-layout").layout({
+      applyDefaultStyles: true
+    });
   });
   </script>
 {% endblock script %}
@@ -173,7 +176,12 @@
               </div>
             </div>
             <div class="container" style="height: inherit">
-              <div id="data-view" style="height: 100%"></div>
+              <!--<div id="data-view" style="height: 100%"></div>-->
+              <div id="test-layout" class="col-lg-12 col-xs-18" style="height: 100%">
+                <div class="ui-layout-center">Center</div>
+                <div class="ui-layout-north">North</div>
+                <div class="ui-layout-south">South</div>
+              </div>
             </div>            
           </div><!-- /#template-sheet-pane -->
         </div><!-- .tab-content -->
