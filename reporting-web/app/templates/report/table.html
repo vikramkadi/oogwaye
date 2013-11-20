@@ -118,9 +118,6 @@
     // Initialize work area with blank worksheet
     new App.Studio.Report.Worksheet();
 
-    $("#test-layout").layout({
-      applyDefaultStyles: true
-    });
   });
   </script>
 {% endblock script %}
@@ -176,12 +173,7 @@
               </div>
             </div>
             <div class="container" style="height: inherit">
-              <!--<div id="data-view" style="height: 100%"></div>-->
-              <div id="test-layout" class="col-lg-12 col-xs-18" style="height: 100%">
-                <div class="ui-layout-center">Center</div>
-                <div class="ui-layout-north">North</div>
-                <div class="ui-layout-south">South</div>
-              </div>
+              <div id="data-view" style="height: 100%"></div>
             </div>            
           </div><!-- /#template-sheet-pane -->
         </div><!-- .tab-content -->

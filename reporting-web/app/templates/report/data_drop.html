@@ -18,21 +18,25 @@ for display.
 
 <script>
   var ns = App.namespace("App.Studio.Data");
-
   ns.DataToken = function( dataItem, uiCallback ) {
+    var dataName = dataItem.data( "data-name" );
+    var dataType = dataItem.data( "data-type" );
+    var columnId = dataItem.data( "column-id" );
     var token = $( "<li></li>" ).addClass( "token-input-token" );
     $( "<p></p>" ).html( dataItem.text() ).appendTo( token );
     $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
       this.parentNode.remove();
       uiCallback( this );
     }).appendTo( token );
+    // Create data handler for this token
+    var dataHandler = new App.Studio.Data.DataHandlerByType( dataName, dataType, columnId );
     // Set object properties
     token.dblclick( function() {
-      //alert("Hello");
-      $( "#responsive" ).modal( );
+      var h = $( this ).data( "data-handler" );
+      if ( h ) h.getDialog().modal();
     });
-    token.prop( "id", dataItem.data( "data-name" ) );
-    token.data( "data-handler", new App.Studio.Data.DataHandler( dataItem ) );
+    token.prop( "id", dataName);
+    token.data( "data-handler", dataHandler );
     return token;
   }
 
@@ -129,43 +133,4 @@ for display.
     </div>
   </form>
   -->
-  <!--
-  <button class="demo btn btn-primary btn-lg" data-toggle="modal" href="#responsive">View Demo</button>
-  -->
-</div>
-
-<!-- Modal Definitions (tabbed over for <pre>) -->
-<div id="responsive" class="modal fade" tabindex="-1" data-width="760" style="display: none;">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h4 class="modal-title">Responsive</h4>
-  </div>
-  <div class="modal-body">
-    <div class="row">
-      <div class="col-md-6">
-        <h4>Some Input</h4>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-      </div>
-      <div class="col-md-6">
-        <h4>Some More Input</h4>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-        <p><input class="form-control" type="text" /></p>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
-    <button type="button" class="btn btn-primary">Save changes</button>
-  </div>
 </div>
