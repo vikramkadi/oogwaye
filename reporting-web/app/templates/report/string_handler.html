@@ -1,0 +1,17 @@
+<!--
+string_handler.html:
+Implements string handler.
+/-->
+<script>
+  // Declare namespace
+  var ns = App.namespace("App.Studio.Data");
+
+  // StringHandler
+  ns.StringHandler  = function( name, columnId ) {
+    this.dataName  = name;
+    this.columnId  = columnId;
+  }
+  ns.StringHandler.prototype = Object.create( ns.DataHandler.prototype );
+  ns.StringHandler.prototype.dataType = "string";
+  
+</script>

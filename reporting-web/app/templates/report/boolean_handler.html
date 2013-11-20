@@ -1,0 +1,17 @@
+<!--
+boolean_handler.html:
+Implements boolean handler.
+/-->
+<script>
+  // Declare namespace
+  var ns = App.namespace("App.Studio.Data");
+  
+  // BooleanHandler
+  ns.BooleanHandler = function( name, columnId ) {
+    this.dataName  = name;
+    this.columnId  = columnId;
+  }
+  ns.BooleanHandler.prototype = Object.create( ns.DataHandler.prototype );
+  ns.BooleanHandler.prototype.dataType = "boolean";
+
+</script>

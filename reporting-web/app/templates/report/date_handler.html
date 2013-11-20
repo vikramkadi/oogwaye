@@ -1,0 +1,80 @@
+<!--
+date_handler.html:
+Implements date handler.
+/-->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+
+<script>
+  // Declare namespace
+  var ns = App.namespace("App.Studio.Data");
+
+  // DateHandler
+  ns.DateHandler    = function( name, columnId ) {
+    this.dataName   = name;
+    this.columnId   = columnId;
+    this.modifyOp   = "DAY";    // TODO
+    this.formatOp   = "DATE";
+    this.formatArgs = { pattern: "MMMM d, yyyy" }
+  }
+  ns.DateHandler.prototype = Object.create( ns.DataHandler.prototype );
+  ns.DateHandler.prototype.dataType = "date";
+
+  // Data Modifying Operations
+  ns.DateHandler.prototype.modifyOpsList = {
+    DAY: {  
+      func: function( date ) {
+        return date.clearTime();
+      },
+      type: "date"
+    },
+    MONTH: {
+      func: function( date ) {
+        return date.moveToFirstDayOfMonth();
+      },
+      type: "date"
+    },
+    QUARTER: {
+      func: function( date ) {
+        return Math.floor( date.getMonth()/3 ) + 1;
+      },
+      type: "number"
+    },
+  }
+
+  // Data Combining Operations
+  ns.DateHandler.prototype.combineOpsList = {
+    AVG: {
+      func: function( values ) {
+        return google.visualization.data.avg( values );
+      },
+      type: "number"
+    },
+    MAX: {
+      func: function( values ) {
+        return google.visualization.data.max( values );
+      },
+      type: "number"
+    }
+  }
+
+  // Formatting Operations
+  ns.DateHandler.prototype.formatOpsList = {
+    DATE: {
+      func: function( opts ) {
+        return new google.visualization.DateFormat({
+          pattern:  opts.pattern
+        });
+      }
+    },
+    USD: {
+      func: function( opts ) {
+        return new google.visualization.NumberFormat({
+          prefix: '$', 
+          negativeColor: 'red', 
+          negativeParens: true
+        });
+      }
+    }
+  }
+
+</script>
