@@ -25,19 +25,39 @@ Implements date handler.
       func: function( date ) {
         return date.clearTime();
       },
-      type: "date"
+      type: "date",
+      label: "Date"
     },
+    DAYOFTHEWEEK: {
+      func: function( date ) {
+        return date.clearTime();
+      },
+      type: "date",
+      label: "Day of the Week"
+    }, 
     MONTH: {
       func: function( date ) {
         return date.moveToFirstDayOfMonth();
       },
-      type: "date"
+      type: "date",
+      label: "Date"
     },
     QUARTER: {
       func: function( date ) {
         return Math.floor( date.getMonth()/3 ) + 1;
       },
-      type: "number"
+      type: "number",
+      label: "Quarter"
+    },
+    YEAR: {
+      func: function( date ) {
+        return date.clearTime().set({
+          month: 1,
+          day: 1
+        });
+      },
+      type: "date",
+      label: "Year"
     },
   }
 
@@ -47,34 +67,44 @@ Implements date handler.
       func: function( values ) {
         return google.visualization.data.avg( values );
       },
-      type: "number"
+      type: "number",
+      label: "Average"
     },
     MAX: {
       func: function( values ) {
         return google.visualization.data.max( values );
       },
-      type: "number"
+      type: "number",
+      label: "Max"
     }
   }
 
   // Formatting Operations
   ns.DateHandler.prototype.formatOpsList = {
-    DATE: {
+    SHORT: {
       func: function( opts ) {
         return new google.visualization.DateFormat({
-          pattern:  opts.pattern
+          formatType:  'short'
         });
-      }
+      },
+      label: "2/28/14"
     },
-    USD: {
+    MEDIUM: {
       func: function( opts ) {
-        return new google.visualization.NumberFormat({
-          prefix: '$', 
-          negativeColor: 'red', 
-          negativeParens: true
+        return new google.visualization.DateFormat({
+          formatType:  'medium'
         });
-      }
-    }
+      },
+      label: "Feb 28, 2014"
+    },
+    LONG: {
+      func: function( opts ) {
+        return new google.visualization.DateFormat({
+          formatType:  'long'
+        });
+      },
+      label: "February 28, 2014"
+    },
   }
 
 </script>

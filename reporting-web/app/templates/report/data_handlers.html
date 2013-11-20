@@ -47,7 +47,8 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
       func: function( data ) {
         return toString(data);
       },
-      type: "string"
+      type: "string",
+      label: "Noop"
     },
   }
 
@@ -57,7 +58,8 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
       func: function( values ) {
         return 0;
       },
-      type: "number"
+      type: "number",
+      label: "Noop"
     },
   }
 
@@ -66,7 +68,8 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     NOOP: {
       func: function( opts ) {
         return undefined;
-      }
+      },
+      label: "None"
     }
   }
 
@@ -97,7 +100,11 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     }
   }
 
-  ns.newRadioButton = function( buttonName ) {
+  ns.DataHandler.test = function() {
+    console.log("hello");
+  }
+
+  ns.DataHandler.newRadioButton = function( buttonName, buttonId ) {
     var button = $( "<label></label>" ).addClass( "btn btn-default" );
     button.append( function() {
       htmlStr  = "input type='radio'";
@@ -121,8 +128,9 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     var buttonGroup = $( "#modify-choices", dialog );
     var opNames  = Object.keys( this.modifyOpsList );
     var activeOp = this.modifyOp;
-    $.map( opNames, App.Studio.Data.newRadioButton ).map( function( button ) {
-      console.log( button.text() );
+    App.Studio.Data.DataHandler.test();
+    console.log(App.Studio.Data.DataHandler.test);
+    $.map( opNames, App.Studio.Data.DataHandler.newRadioButton ).map( function( button ) {
       if ( button.text() == activeOp ) {
         button.addClass( "active" );
       }
@@ -132,8 +140,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     buttonGroup = $( "#combine-choices", dialog );
     opNames  = Object.keys( this.combineOpsList );
     var activeOp = this.combineOp;
-    $.map( opNames, App.Studio.Data.newRadioButton ).map( function( button ) {
-      console.log( button.text() );
+    $.map( opNames, App.Studio.Data.DataHandler.newRadioButton ).map( function( button ) {
       if ( button.text() == activeOp ) {
         button.addClass( "active" );
       }
@@ -141,10 +148,9 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
     });
     // Format options
     buttonGroup = $( "#format-choices", dialog );
-    opNames  = Object.keys( this.combineOpsList );
-    var activeOp = this.combineOp;
-    $.map( opNames, App.Studio.Data.newRadioButton ).map( function( button ) {
-      console.log( button.text() );
+    opNames  = Object.keys( this.formatOpsList );
+    var activeOp = this.formatOp;
+    $.map( opNames, App.Studio.Data.DataHandler.newRadioButton ).map( function( button ) {
       if ( button.text() == activeOp ) {
         button.addClass( "active" );
       }
@@ -184,6 +190,7 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
         dataHandler = new App.Studio.Data.StringHandler( dataName, column_Id );
         break;
     }
+    console.log(dataHandler);
     return dataHandler;
   }
 </script>
