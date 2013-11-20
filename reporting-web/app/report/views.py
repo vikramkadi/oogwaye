@@ -5,7 +5,6 @@ from flask import request
 from flask import jsonify
 from app.report import datasources, dbhelper, helper
 from app.users import security
-
 from app.services import mongo
 
 report_mod = Blueprint('report', __name__)
@@ -19,6 +18,10 @@ def create_report_step_1():
 @report_mod.route('/create/step2')
 def create_report_step_2():
     return render_template('/report/table.html')
+
+@report_mod.route('/create/step3')
+def create_report_step_3():
+    return render_template('/report/main2.html')
 
 @report_mod.route('/create/step2/start', methods=["GET","POST"])
 def create_report_step2_start():

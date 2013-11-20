@@ -7,13 +7,14 @@
 {% block script %}
   {{ super() }}
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
-  <script type="text/javascript" src="{{url_for('static',filename='js/libs/jquery-layout/jquery.layout-latest.js')}}"></script>
+  <script type="text/javascript" src="{{url_for('static',filename='libs/jquery-layout/jquery.layout-latest.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='js/report/gdata_table.js')}}"></script>
 
   <script>
   //This has been called with sql:'{{ sql }}' for database '{{ datasource }}' 
+  var ns = App.namespace("App.Studio.Report");
 
-  function newWorksheet() {
+  ns.Worksheet = function() {
     var nsheets = $( "#workbook .tab-pane" ).length - 1;
     var sheetId = "worksheet-".concat(nsheets.toString());
     var sheetLabel = "Worksheet ".concat(nsheets.toString());
@@ -22,13 +23,13 @@
       display: "" 
     }).prop( "id", sheetId ).addClass( "active" );
     // Append data-drop widget into pane
-    $( "#placeholder-data-drop", sheetPane).append( newDataDrop() );
+    $( "#placeholder-data-drop", sheetPane).append( new App.Studio.Data.DataDropWidget( App.Studio.Report.updateView ) );
     // Setup default viewer type and menu callback
     sheetPane.data( "viewing-style", "table" );
     $( "#viewer-menu", sheetPane ).menu({
-      select: function(event, ui) {
+      select: function( event, ui ) {
         sheetPane.data( "viewing-style", ui.item.text() );
-        updateView();
+        App.Studio.Report.updateView( this );
       }
     });
     // Create new tab by copying the template
@@ -42,46 +43,42 @@
     return sheetTab;
   }
 
-  function activateNewWorksheet() {
-    var sheetTab = newWorksheet();
+  ns.newActiveWorksheet = function() {
+    var sheetTab = new App.Studio.Report.Worksheet();
     //$( "#new-sheet-tab" ).removeClass( "active" );
     $( sheetTab ).addClass( "active" );
   }
 
-  function getActiveDataTable() {
+  ns.getActiveDataTable = function() {
      var dataTable  = $( "#workbook" ).data( "dataTable" );
      return dataTable;
   }
 
-  function getActiveWorksheet() {
+  ns.getActiveWorksheet = function() {
     var sheet = $( "#sheet-panes > .tab-pane.active" );
     return sheet;
   }
 
-  function getActiveViewerType() {
-    var sheet = getActiveWorksheet();
+  ns.getActiveViewerType = function() {
+    var sheet = App.Studio.Report.getActiveWorksheet();
     return $( sheet ).data( "viewing-style" );
   }
 
   // Main entry point for updating data display
-  function updateView() {
-    var thisSheet = getActiveWorksheet();
-    var dataTable = getActiveDataTable();
+  ns.updateView = function( uiElement ) {
+    var thisSheet = App.Studio.Report.getActiveWorksheet();
+    var dataTable = App.Studio.Report.getActiveDataTable();
     if ( thisSheet != undefined && dataTable != undefined ) {
-      // Get column names then find their corresponding table indeces
-      console.log( $( getDataDropDataTokens( thisSheet)));
-      var columnIds = $( getDataDropDataTokens( thisSheet ) ).map( function() {
-        //return this.getAttribute("column-id");
-        console.log( $(this).data("data-handler") );
-        return $( this ).data( "data-handler" ).column_id;         
-      }).get();
-      console.log(columnIds);
       // Create dataView and display in view pane
-      var dataView = new google.visualization.DataView( dataTable );
-      dataView.setColumns( columnIds );
+      // var dataView = new google.visualization.DataView( dataTable );
+      // dataView.setColumns( columnIds );
+      var xKeys = App.Studio.Data.getXdataColumnKeys( thisSheet );
+      var yKeys = App.Studio.Data.getYdataColumnKeys( thisSheet );
+      var dataView = google.visualization.data.group( dataTable, xKeys, yKeys );
+      App.Studio.Data.formatColumns( dataView, thisSheet );
       var thisView = $( "#data-view", thisSheet );
       // Finally, draw the dataView
-      drawUsingViewingStyle( getActiveViewerType(), thisView[0], dataView );
+      App.Studio.Viz.drawWithViewingStyle( thisView[0], dataView, App.Studio.Report.getActiveViewerType() );
     }
   }
 
@@ -110,16 +107,16 @@
 
     $.get( fusionTableColumns( tableId, apiKey ), function( json ) {
       $( "#workbook" ).data( "dataTable", newDataTable( json ) );
-      $( "#sidebar" ).append( newDataBin( json ) );
+      $( "#sidebar" ).append( new App.Studio.Data.DataBin( json ) );
     });
 
     // Get fusion table data to populate dataTable object
     $.get( fusionTableData( tableId, apiKey ), function( json ) {
-      loadDataTable( getActiveDataTable(), json );
+      loadDataTable( App.Studio.Report.getActiveDataTable(), json );
     });
 
     // Initialize work area with blank worksheet
-    newWorksheet();
+    new App.Studio.Report.Worksheet();
 
   });
   </script>
@@ -132,7 +129,6 @@
 {% block content %}
   {{ super() }}
   {% include "/report/data_bin.html"  %}
-  {% include "/report/data_handlers.html" %}
   {% include "/report/data_drop.html" %}
   {% include "/report/data_viz.html"  %}
 
@@ -143,8 +139,12 @@
       </div>
       <div id="workbook" class="col-md-10 col-xs15 tabbable" style="height: 100%">
         <ul id="sheet-tabs" class="nav nav-tabs">
-          <li id="new-sheet-tab" onMouseUp="activateNewWorksheet()"><a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a></li>
-          <li id="template-sheet-tab" style="display: none"><a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a></li>
+          <li id="new-sheet-tab" onMouseUp="App.Studio.Report.newActiveWorksheet()">
+            <a href="#new-sheet-pane" data-toggle="tab"><i class="icon-plus icon-white"></i></a>
+          </li>
+          <li id="template-sheet-tab" style="display: none">
+            <a href="#template-sheet-pane" data-toggle="tab">Template Worksheet</a>
+          </li>
         </ul>
         <div id="sheet-panes" class="tab-content" style="height: 93%">
           <div id="new-sheet-pane" class="tab-pane container">

@@ -1,0 +1,17 @@
+<!--
+time_handler.html:
+Implements time handler.
+/-->
+<script>
+  // Declare namespace
+  var ns = App.namespace("App.Studio.Data");
+  
+  // TimeHandler
+  ns.TimeHandler = function( name, columnId ) {
+    this.dataName = name;
+    this.columnId = columnId;
+  }
+  ns.TimeHandler.prototype = Object.create( ns.DataHandler.prototype );
+  ns.TimeHandler.prototype.dataType = "timeofday";
+  
+</script>

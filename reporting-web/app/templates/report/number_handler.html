@@ -1,0 +1,83 @@
+<!--
+number_handler.html:
+Implements number handler.
+/-->
+
+<script>
+  // Declare namespace
+  var ns = App.namespace("App.Studio.Data");
+
+  // NumberHandler
+  ns.NumberHandler  = function( name, columnId ) { 
+    this.dataName   = name;
+    this.columnId   = columnId;
+    this.combineOp  = "AVG";    // TODO
+    this.formatOp   = "USD";
+  }
+  ns.NumberHandler.prototype = Object.create( ns.DataHandler.prototype );
+  ns.NumberHandler.prototype.dataType = "number";
+
+  // Data Modifying Operations
+  ns.NumberHandler.prototype.modifyOpsList = {
+    DAY: {  
+      func: function( date ) {
+        return date.clearTime();
+      },
+      type: "date"
+    },
+    MONTH: {
+      func: function( date ) {
+        return date.moveToFirstDayOfMonth();
+      },
+      type: "date"
+    },
+    QUARTER: {
+      func: function( date ) {
+        return Math.floor( date.getMonth()/3 ) + 1;
+      },
+      type: "number"
+    },
+  }
+
+  // Data Combining Operations
+  ns.NumberHandler.prototype.combineOpsList = {
+    AVG: {
+      func: function( values ) {
+        return google.visualization.data.avg( values );
+      },
+      type: "number"
+    },
+    MAX: {
+      func: function( values ) {
+        return google.visualization.data.max( values );
+      },
+      type: "number"
+    }
+  }
+
+  // Formatting Operations
+  ns.NumberHandler.prototype.formatOpsList = {
+    DATE: {
+      func: function( opts ) {
+        return new google.visualization.DateFormat({
+          pattern:  opts.pattern
+        });
+      }
+    },
+    USD: {
+      func: function( opts ) {
+        return new google.visualization.NumberFormat({
+          prefix: '$', 
+          negativeColor: 'red', 
+          negativeParens: true
+        });
+      }
+    }
+  }
+
+  ns.NumberHandler.prototype.getDialog = function() {
+    var dialog = $( "#number-handler-editor" );
+    return dialog;
+  }
+
+ </script>

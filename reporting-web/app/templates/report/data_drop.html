@@ -3,6 +3,8 @@ data_drop.html:
 Implements drop boxes for data fields. Data dropped in these boxes are readied
 for display.
 /-->
+{% include "/report/data_handlers.html" %}
+
 <link rel="stylesheet" href="{{url_for('static', filename='css/common/token-input.css')}}" type="text/css" />
 
 <style>
@@ -15,40 +17,74 @@ for display.
 </style>
 
 <script>
-  var ns = App.namespace("App.Studio.Data.Drop");
-  var dataHandlers = App.namespace("App.Studio.Data.Handlers");
-
-  function newDataToken( dataItem ) {
+  var ns = App.namespace("App.Studio.Data");
+  ns.DataToken = function( dataItem, uiCallback ) {
+    var dataName = dataItem.data( "data-name" );
+    var dataType = dataItem.data( "data-type" );
+    var columnId = dataItem.data( "column-id" );
     var token = $( "<li></li>" ).addClass( "token-input-token" );
     $( "<p></p>" ).html( dataItem.text() ).appendTo( token );
     $( "<span></span>" ).addClass( "icon-remove-sign" ).click( function() {
       this.parentNode.remove();
-      updateView();
+      uiCallback( this );
     }).appendTo( token );
+    // Create data handler for this token
+    var dataHandler = new App.Studio.Data.DataHandlerByType( dataName, dataType, columnId );
     // Set object properties
-    token.prop( "id", dataItem.prop( "data-name" ) );
-    token.data( "data-handler", dataHandlers.newDataHandler( dataItem ) );
+    token.dblclick( function() {
+      var h = $( this ).data( "data-handler" );
+      if ( h ) h.getDialog().modal();
+    });
+    token.prop( "id", dataName);
+    token.data( "data-handler", dataHandler );
     return token;
   }
 
-  function newDataDrop() {
+  ns.DataDropWidget = function( uiCallback ) {
     var dataDrop = $( "#template-data-drop" ).contents().clone();
     $( ".droppable-input", dataDrop ).droppable({
       activeClass: "ui-state-default",
       drop: function( event, ui ) {
-        $("#placeholder", this).before( newDataToken( ui.draggable ));
-        updateView();
+        $( "#placeholder", this ).before( new App.Studio.Data.DataToken( ui.draggable, uiCallback ));
+        uiCallback( this );
       }
     });
     return dataDrop;
   }
 
-  // Return array of Tokens stored for given view
-  function getDataDropDataTokens( domContext ) {
-    var tokens = $( "ul .token-input-token", domContext ).map( function() {
-      return this;
-    }).get();
-    return tokens;
+  // Return array of keys for grouping columns
+  ns.getXdataColumnKeys = function( domContext ) {
+    var columnKeys = $( "#x-tokens .token-input-token", domContext ).map( function() {
+      var dataHandler = $( this ).data( "data-handler" );
+      if ( dataHandler != undefined ) {
+        return dataHandler.getModifier();
+      }
+    });
+    return columnKeys ? columnKeys.get() : [];
+  }
+
+  ns.getYdataColumnKeys = function( domContext ) {
+    var columnKeys = $( "#y-tokens .token-input-token", domContext ).map( function() {
+      var dataHandler = $( this ).data( "data-handler" );
+      if ( dataHandler != undefined ) {
+        return dataHandler.getCombiner();
+      }
+    });
+    return columnKeys ? columnKeys.get() : [];
+  }
+
+  ns.formatColumns = function( dataTable, domContext ) {
+    for ( var index = 0; index < dataTable.getNumberOfColumns(); index++ ) {
+      var dataName  = dataTable.getColumnLabel( index );
+      var dataToken = $( "#" + dataName + ".token-input-token", domContext );
+      var dataHandler = $( dataToken ).data( "data-handler" );
+      if ( dataHandler != undefined ) {
+        var formatter = dataHandler.getFormatter();
+        if ( formatter ) {
+          formatter.format( dataTable, index );
+        }
+      }
+    }
   }
 
 </script>
@@ -58,7 +94,7 @@ for display.
   <div id="data-drop" class="container">
     <div class="input-group input-group-md" style="margin-bottom: 15px">
     <span class="input-group-addon"><em>X</em></span>
-    <ul class="form-control input-md droppable-input token-input-list">
+    <ul id="x-tokens" class="form-control input-md droppable-input token-input-list">
       <li id="placeholder">
         <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
       </li>
@@ -66,7 +102,7 @@ for display.
     </div>
     <div class="input-group input-group-md" style="margin-bottom: 15px">
     <span class="input-group-addon"><em>Y</em></span>
-    <ul class="form-control input-md droppable-input token-input-list">
+    <ul id="y-tokens" class="form-control input-md droppable-input token-input-list">
       <li id="placeholder">
         <input type="text" autocomplete="off" style="outline: none" placeholder="" disabled="true">
       </li>

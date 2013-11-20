@@ -4,90 +4,253 @@ Implements data handlers, i.e.  for grouping, aggregating, and formatting the di
 /-->
 <script>
   // Declare namespace
-  var ns = App.namespace("App.Studio.Data.Handlers");
+  var ns = App.namespace("App.Studio.Data");
 
-  ns.BasicHandler = function () {
-    this.data_name      = undefined;
-    this.data_type      = undefined;
-    this.group_enabled  = false;
-    this.group_func     = undefined;
-    this.agg_enabled    = false;
-    this.agg_func       = undefined;
-    this.format_enabled = false;
-    this.format_func    = undefined;
+  // Modifier class
+  ns.Modifier = function( columnId, columnName, modifier, returnType ) {
+    this.id = columnName;
+    this.label = columnName;
+    this.column = columnId;
+    this.modifier = modifier;
+    this.type = returnType;
   }
 
-  ns.BooleanHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+  // Combiner class
+  ns.Combiner = function( columnId, columnName, combiner, returnType ) {
+    this.id = columnName;
+    this.label = columnName;
+    this.column = columnId;
+    this.aggregation = combiner;
+    this.type = returnType;
   }
 
-  ns.DateHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+  // DataHandler:  base class
+  ns.DataHandler = function () {
+    this.dataName    = undefined;
+    this.dataType    = undefined;
+    this.columnId    = -1;
+    this.modifyOp    = undefined;
+    this.modifyArgs  = undefined;
+    this.combineOp   = undefined;
+    this.combineArgs = undefined;
+    this.formatOp    = undefined;
+    this.formatArgs  = undefined;
+    // Common handler class methods
+
+    this.getCombiner  = function() { return this.columnId; }
+    this.getFormatter = function() { return undefined; }
   }
 
-  ns.LocationHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+  // Data Modifying Operations
+  ns.DataHandler.prototype.modifyOpsList = {
+    NOOP: {  
+      func: function( data ) {
+        return toString(data);
+      },
+      type: "string",
+      label: "Noop"
+    },
   }
 
-  ns.NumberHandler = function( name, column_id ) { 
-    this.data_name = name;
-    this.column_id = column_id;
+  // Data Combining Operations
+  ns.DataHandler.prototype.combineOpsList = {
+    NOOP: {
+      func: function( values ) {
+        return 0;
+      },
+      type: "number",
+      label: "Noop"
+    },
   }
 
-  ns.StringHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
+  // Formatting Operations
+  ns.DataHandler.prototype.formatOpsList = {
+    NOOP: {
+      func: function( opts ) {
+        return undefined;
+      },
+      label: "None"
+    }
   }
-  ns.StringHandler.prototype = Object.create( ns.BasicHandler.prototype );
-  ns.StringHandler.prototype.data_type = "string";
-  ns.StringHandler.prototype.debug_func = function() {
-    console.log( this.data_name + " of type " + this.data_type + " " + this.column_id);
+
+  ns.DataHandler.prototype.getModifier  = function() { 
+    var modifyOp = this.modifyOpsList[ this.modifyOp ];
+    if ( modifyOp != undefined ) {
+      return new App.Studio.Data.Modifier( this.columnId, this.dataName, modifyOp.func, modifyOp.type );
+    } else {
+      return this.columnId;
+    }
+  }
+
+  ns.DataHandler.prototype.getCombiner = function() {
+    var combineOp = this.combineOpsList[ this.combineOp ];
+    if ( combineOp != undefined ) {
+      return new App.Studio.Data.Combiner( this.columnId, this.dataName, combineOp.func, combineOp.type );
+    } else {
+      return this.columnId;
+    }
+  }
+
+  ns.DataHandler.prototype.getFormatter = function() {
+    var formatOp = this.formatOpsList[ this.formatOp ];
+    if ( formatOp != undefined ) {
+      return formatOp.func( this.formatArgs );
+    } else {
+      return undefined;
+    }
+  }
+
+  ns.DataHandler.test = function() {
+    console.log("hello");
+  }
+
+  ns.DataHandler.newRadioButton = function( buttonName, buttonId ) {
+    var button = $( "<label></label>" ).addClass( "btn btn-default" );
+    button.append( function() {
+      htmlStr  = "input type='radio'";
+      htmlStr += " name=" + buttonName;
+      htmlStr += " id=" + buttonName;
+      return "<" + htmlStr + ">";
+    }).append( buttonName );
+    return button;
+  }
+
+  ns.DataHandler.prototype.getDialog = function() {
+    // Clone dialog template
+    var dialog = $( "#data-handler-dialog" ).clone();
+    // Set header with token name and type
+    $( "<h3></h3>" ).html(
+      "E<small>dit properties of</small> " + 
+      "<em>" + this.dataType + "</em> <small>type</small> " +
+      "<em>" + this.dataName + "</em> "
+    ).appendTo( $( ".modal-header", dialog ) );
+    // Modify options
+    var buttonGroup = $( "#modify-choices", dialog );
+    var opNames  = Object.keys( this.modifyOpsList );
+    var activeOp = this.modifyOp;
+    App.Studio.Data.DataHandler.test();
+    console.log(App.Studio.Data.DataHandler.test);
+    $.map( opNames, App.Studio.Data.DataHandler.newRadioButton ).map( function( button ) {
+      if ( button.text() == activeOp ) {
+        button.addClass( "active" );
+      }
+      button.appendTo( buttonGroup );
+    });
+    // Combine options
+    buttonGroup = $( "#combine-choices", dialog );
+    opNames  = Object.keys( this.combineOpsList );
+    var activeOp = this.combineOp;
+    $.map( opNames, App.Studio.Data.DataHandler.newRadioButton ).map( function( button ) {
+      if ( button.text() == activeOp ) {
+        button.addClass( "active" );
+      }
+      button.appendTo( buttonGroup );
+    });
+    // Format options
+    buttonGroup = $( "#format-choices", dialog );
+    opNames  = Object.keys( this.formatOpsList );
+    var activeOp = this.formatOp;
+    $.map( opNames, App.Studio.Data.DataHandler.newRadioButton ).map( function( button ) {
+      if ( button.text() == activeOp ) {
+        button.addClass( "active" );
+      }
+      button.appendTo( buttonGroup );
+    });
+    return dialog;
+  }
+
+  ns.DataHandler.prototype.info = function() {
+    console.log( this.dataName + " of type " + this.dataType + " and id " + this.columnId);
     return;
   }
-  ns.StringHandler.prototype.group_func = function() {
-    return "group";;
-  }
-  ns.StringHandler.prototype.agg_func = function() {
-    return "aggregate";
-  }
 
-  ns.TimeHandler = function( name, column_id ) {
-    this.data_name = name;
-    this.column_id = column_id;
-  }
-
-  ns.newDataHandler = function( dataItem ) {
-    var dataName = dataItem.data( "data-name" );
-    var dataType = dataItem.data( "data-type" );
-    var columnId = dataItem.data( "column-id" );
+  ns.DataHandlerByType = function( dataName, dataType, columnId ) {
     var dataHandler;
     switch ( dataType ) {
       case "boolean":
-        dataHandler = new this.StringHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.StringHandler( dataName, columnId );
         break;
       case "date":
       case "datetime":
-        dataHandler = new this.DateHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.DateHandler( dataName, columnId );
         break;
       case "location":
-        dataHandler = new this.LocationHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.LocationHandler( dataName, columnId );
         break;
       case "number":
-        dataHandler = new this.NumberHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.NumberHandler( dataName, columnId );
         break;
       case "string":
-        dataHandler = new this.StringHandler( dataName, columnId );
+        dataHandler = new App.Studio.Data.StringHandler( dataName, columnId );
         break;
       case "timeofday":
-        dataHandler = new this.TimeDataHandler( dataName, column_id );
+        dataHandler = new App.Studio.Data.TimeDataHandler( dataName, columnId );
         break;
       default:
-        dataHandler = new this.StringHandler( dataName, column_Id );
+        dataHandler = new App.Studio.Data.StringHandler( dataName, column_Id );
         break;
     }
+    console.log(dataHandler);
     return dataHandler;
   }
 </script>
+
+<div id="data-handler-dialog" class="modal fade" tabindex="-1" data-width="760" style="display: none;">
+  <div class="modal-header">
+    <!-- insert header text here, e.g. <h3>Data Handler</h3> -->
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+  </div>
+  <div class="modal-body">
+    <p><h3>G<small>roup by</small></h3></p>
+    <div id="modify-choices" class="btn-group" data-toggle="buttons">
+      <!-- insert radio buttons here, e.g.
+      <label id="template-button" class="btn btn-primary">
+        <input type="radio" name="options" id="option1"> Option 1
+      </label>
+      -->
+    </div>
+    <p><h3>C<small>ombine using</small></h3></p>
+    <div id="combine-choices" class="btn-group" data-toggle="buttons">
+      <!-- insert radio buttons here, e.g.
+      <label id="template-button" class="btn btn-primary">
+        <input type="radio" name="options" id="option1"> Option 1
+      </label>
+      -->
+    </div>
+    <p><h3>D<small>isplay format</small></h3></p>
+    <div id="format-choices" class="btn-group" data-toggle="buttons">
+      <!-- insert radio buttons here, e.g.
+      <label id="template-button" class="btn btn-primary">
+        <input type="radio" name="options" id="option1"> Option 1
+      </label>
+      -->
+    </div>
+    <!--
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#tab1" data-toggle="tab">Tab 1</a></li>
+      <li><a href="#tab2" data-toggle="tab">Tab 2</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="tab1">
+        <p>This modal was loaded in via ajax</p>
+      </div>
+      <div class="tab-pane" id="tab2">
+        <p>This is some other tab content</p>
+      </div>
+    </div>
+    <button class="btn update">Update</button>
+    -->
+  </div>
+  <div class="modal-footer">
+    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+    <button type="button" class="btn btn-primary">Accept</button>
+  </div>
+</div>
+
+{% include "/report/boolean_handler.html" %}
+{% include "/report/date_handler.html" %}
+{% include "/report/location_handler.html" %}
+{% include "/report/number_handler.html" %}
+{% include "/report/string_handler.html" %}
+{% include "/report/time_handler.html" %}
+
