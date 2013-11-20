@@ -1,0 +1,32 @@
+
+Report Saving
+
+0. UUID
+1. Database - id
+2. Name
+3. created_by/updated_by/create_dt/update_dt
+4. Cron-Expression
+5. SQL
+5. Plots : {
+			plot1 : {
+					type: Line | Bar | Pie | ScatterPlot,
+					x-axis: [{label: "date", col-index: 0}],
+					y-axis: [{label: "sales", col-index: 3}],
+					}
+			}
+6. Reports: {
+			report1 : {format: xls | pdf | csv}
+			}
+7. Alerts: {
+			alert1 : {index: 0 , threshold-type: over | under | not-between,
+						threshold-values:[100,200]
+						}
+			}
+8. sample-image-snapshot: [binary-data]
+
+
+
+User Data
+
+
+
