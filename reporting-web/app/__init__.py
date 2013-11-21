@@ -16,9 +16,9 @@ app.secret_key = settings.secret_key
 def initialize(config):
     base_dir = config.base_dir
     
-    if os.path.exists(os.path.join(base_dir,config.datasources_store)):
-        datasources.init_datasources(os.path.join(base_dir,config.datasources_store))
-        datasources.init_db_engines(base_dir)
+    """if os.path.exists(os.path.join(base_dir,config.datasources_store)):
+        "datasources.init_datasources(os.path.join(base_dir,config.datasources_store))
+        "datasources.init_db_engines(base_dir)"""
     
 
     mongo.init_mongo(config.mongo_host, config.mongo_port, config.mongo_db_name)
