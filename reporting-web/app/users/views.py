@@ -4,11 +4,15 @@ from app.users import security
 
 users_mod = Blueprint('users', __name__)
 
+@users_mod.route('/login', methods=['GET'])
+def login_screen():
+	return render_template('/users/login.html', message="Enter email/password to access")
+
 @users_mod.route('/login', methods=['POST'])
 def login():
-	(result, reason) = security.check_auth(request)
+	(result, reason, user_rec) = security.check_auth(request)
 	if result:
-		session['user'] = {"name":"vikram"}	
+		session['user'] = user_rec
 		if 'redirect_url' in request.form:
 			return redirect(request.form['redirect_url'])
 		else:
@@ -18,5 +22,5 @@ def login():
 
 @users_mod.route('/logout', methods=['GET'])
 def logout():
-	session['user'] = None
+	session.clear()
 	return render_template('/users/login.html', message="You have been successfully logged out")

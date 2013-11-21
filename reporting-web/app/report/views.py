@@ -16,24 +16,29 @@ def create_report_step_1():
     return render_template('/report/create_step_1.html', ds=datasources.datasources)
 
 @report_mod.route('/create/step2')
+@security.requires_auth
 def create_report_step_2():
     return render_template('/report/table.html')
 
 @report_mod.route('/create/step3')
+@security.requires_auth
 def create_report_step_3():
     return render_template('/report/main2.html')
 
 @report_mod.route('/create/step2/start', methods=["GET","POST"])
+@security.requires_auth
 def create_report_step2_start():
     return render_template('/report/table.html', sql=request.form['sql'], datasource=request.form['datasource'])
 
 @report_mod.route('/create/step2/pulldata', methods=["GET", "POST"])
+@security.requires_auth
 def create_report_step2_pulldata():
     result = dbhelper.pull_from_db(request.form['datasource'], request.form['sql'])
     resp_body = jsonpickle.encode(result, unpicklable=False)
     return flask.Response(resp_body, mimetype='application/json')
 
 @report_mod.route('/create/save', methods=["POST"])
+@security.requires_auth
 def save_report():
 	print request.json
 	result, reason = helper.upsert_report(request.json)

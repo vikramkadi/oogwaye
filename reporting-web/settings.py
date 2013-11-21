@@ -2,8 +2,7 @@ import os
 
 secret_key='fsdkf2#cnofs(2k3fklsdj@'
 
-users_store="config/users.json"
-roles_store="config/roles.json"
+credentials_store="config/credentials.json"
 datasources_store="config/datasources.json"
 db_url="localhost"
 db_port=3306
